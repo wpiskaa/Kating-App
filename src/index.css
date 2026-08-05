@@ -2,10 +2,10 @@
 
 /* ===== DARK THEME (DEFAULT) ===== */
 [data-theme="dark"], :root {
-  --bg-app: #070a14;
-  --bg-surface: #0c0f1e;
-  --bg-card: #131929;
-  --bg-card-2: #1a2135;
+  --bg-app: #060913;
+  --bg-surface: #0b0e1b;
+  --bg-card: #121729;
+  --bg-card-2: #182037;
 
   --indigo: #6366f1;
   --cyan: #22d3ee;
@@ -17,9 +17,10 @@
   --g-indigo-cyan: linear-gradient(135deg, #6366f1, #22d3ee);
   --g-emerald: linear-gradient(135deg, #059669, #10b981);
   --g-rose: linear-gradient(135deg, #e11d48, #f43f5e);
-  --g-amber: linear-gradient(135deg, #d97706, #fbbf24);
+  --g-wallet: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
+  --g-wallet-alert: linear-gradient(135deg, #be123c 0%, #f43f5e 100%);
 
-  --text-1: #f1f5f9;
+  --text-1: #f8fafc;
   --text-2: #94a3b8;
   --text-3: #475569;
 
@@ -49,6 +50,8 @@
   --amber: #d97706;
 
   --g-indigo-cyan: linear-gradient(135deg, #4f46e5, #0891b2);
+  --g-wallet: linear-gradient(135deg, #4338ca 0%, #0284c7 100%);
+  --g-wallet-alert: linear-gradient(135deg, #9f1239 0%, #e11d48 100%);
 
   --text-1: #0f172a;
   --text-2: #475569;
@@ -72,7 +75,41 @@ body {
   transition: background 0.3s ease, color 0.3s ease;
 }
 
-/* App Shell */
+/* ===== ANIMATIONS ===== */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 10px rgba(99,102,241,0.3); }
+  50% { box-shadow: 0 0 22px rgba(99,102,241,0.6); }
+}
+
+@keyframes pulseLive {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.5; }
+}
+
+.anim-fade { animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+.live-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--emerald);
+  display: inline-block;
+  animation: pulseLive 1.5s infinite ease-in-out;
+}
+
+.live-dot-urgent {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--rose);
+  display: inline-block;
+  animation: pulseLive 1s infinite ease-in-out;
+}
+
+/* ===== APP SHELL ===== */
 .viewport {
   min-height: 100vh;
   display: flex;
@@ -95,7 +132,7 @@ body {
   transition: background 0.3s ease;
 }
 
-/* Header */
+/* ===== HEADER ===== */
 .header {
   position: fixed;
   top: 0; left: 50%;
@@ -113,7 +150,7 @@ body {
   transition: background 0.3s ease;
 }
 
-/* Bottom Nav */
+/* ===== BOTTOM NAV ===== */
 .bottom-nav {
   position: fixed;
   bottom: 0; left: 50%;
@@ -160,7 +197,7 @@ body {
   box-shadow: 0 3px 10px rgba(99,102,241,0.4);
 }
 
-/* Page */
+/* ===== PAGE ===== */
 .page {
   padding: 12px 14px;
   display: flex;
@@ -168,14 +205,18 @@ body {
   gap: 10px;
 }
 
-/* Cards */
+/* ===== CARDS ===== */
 .card {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--r-xl);
   padding: 12px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-  transition: background 0.3s ease, border 0.3s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-1px);
 }
 
 .card-hero {
@@ -183,6 +224,33 @@ body {
   padding: 14px;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+}
+
+/* Sleek Digital Wallet Card */
+.wallet-card-hero {
+  border-radius: 20px;
+  padding: 16px;
+  background: var(--g-wallet);
+  color: white;
+  box-shadow: 0 10px 25px rgba(79, 70, 229, 0.35);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.wallet-card-hero.wallet-alert {
+  background: var(--g-wallet-alert);
+  box-shadow: 0 10px 25px rgba(244, 63, 94, 0.45);
+}
+
+.wallet-card-hero::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 140px; height: 140px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 50%;
 }
 
 .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -227,6 +295,11 @@ body {
   border-radius: var(--r-lg);
   background: var(--bg-card-2);
   border: 1px solid var(--border);
+  transition: transform 0.15s ease;
+}
+
+.list-item:active {
+  transform: scale(0.99);
 }
 
 .badge {
@@ -271,6 +344,7 @@ body {
   width: 100%;
   cursor: pointer;
   box-shadow: 0 3px 12px rgba(99,102,241,0.3);
+  transition: all 0.15s ease;
 }
 
 .btn:active { opacity: 0.85; transform: scale(0.98); }
@@ -291,21 +365,6 @@ body {
   cursor: pointer;
 }
 
-.btn-danger {
-  background: var(--g-rose);
-  color: white;
-  border: none;
-  padding: 8px 14px;
-  border-radius: var(--r-lg);
-  font-weight: 700;
-  font-size: 11px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  cursor: pointer;
-}
-
 .icon-btn {
   background: none;
   border: none;
@@ -321,11 +380,6 @@ body {
 .icon-btn:hover { color: var(--rose); background: rgba(244,63,94,0.1); }
 
 .critical-card {
-  border: 1.5px solid var(--rose) !important;
-  background: rgba(244,63,94,0.08) !important;
-}
-
-.wallet-over {
   border: 1.5px solid var(--rose) !important;
   background: rgba(244,63,94,0.08) !important;
 }

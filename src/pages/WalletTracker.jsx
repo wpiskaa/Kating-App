@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import ExpenseModal from '../components/ExpenseModal';
 import { calculateSafeDailyBudget, getDaysRemainingInMonth, checkOverBudget, formatIDR } from '../utils/financialCalculations';
-import { Wallet, AlertCircle, Plus, ArrowDownRight, ShoppingBag, Trash2, Edit2, X } from 'lucide-react';
+import { Wallet, AlertCircle, Plus, ArrowDownRight, ShoppingBag, Trash2, Edit2, X, CreditCard, ShieldCheck } from 'lucide-react';
 
 export default function WalletTracker() {
   const [totalAllowance, setTotalAllowance] = useState(1500000);
@@ -46,59 +46,65 @@ export default function WalletTracker() {
   };
 
   return (
-    <>
-      {/* Safe Limit Card */}
-      <div className={`card ${isOverSafeLimit ? 'wallet-over' : ''}`}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <Wallet size={15} color={isOverSafeLimit ? '#f43f5e' : '#818cf8'} />
-            <span className="label">Batas Aman Belanja Harian (FR-3.3)</span>
+    <div className="anim-fade">
+      {/* Sleek Credit Card Style Wallet Banner */}
+      <div className={`wallet-card-hero ${isOverSafeLimit ? 'wallet-alert' : ''}`}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <CreditCard size={18} color="white" />
+            <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', opacity: 0.9 }}>
+              Batas Aman Belanja (FR-3.3)
+            </span>
           </div>
-          <span className={`badge ${isOverSafeLimit ? 'badge-red' : 'badge-green'}`}>
-            {isOverSafeLimit ? 'Over Limit' : 'Aman'}
+
+          <span className={`badge ${isOverSafeLimit ? 'badge-red' : 'badge-green'}`} style={{ background: 'rgba(255,255,255,0.2)', color: 'white', border: 'none' }}>
+            {isOverSafeLimit ? 'Over Limit' : 'Safe Limit'}
           </span>
         </div>
 
-        <h2 className="mono h1" style={{ color: isOverSafeLimit ? '#fb7185' : '#22d3ee', fontSize: '22px' }}>
-          {formatIDR(safeDailyBudget)} <span className="dim" style={{ fontSize: '11px' }}>/ Hari</span>
+        <h2 className="mono" style={{ fontSize: '24px', fontWeight: 800, lineHeight: 1, marginBottom: '6px' }}>
+          {formatIDR(safeDailyBudget)} <span style={{ fontSize: '12px', opacity: 0.8, fontWeight: 500 }}>/ Hari</span>
         </h2>
 
-        <span className="dim" style={{ display: 'block', marginTop: '2px' }}>
-          Saldo {formatIDR(currentBalance)} • {daysRemaining} Sisa Hari
-        </span>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '12px' }}>
+          <div>
+            <span style={{ fontSize: '10px', opacity: 0.8, display: 'block' }}>Saldo Uang Saku</span>
+            <span className="mono" style={{ fontSize: '13px', fontWeight: 700 }}>{formatIDR(currentBalance)}</span>
+          </div>
+
+          <div style={{ textAlign: 'right' }}>
+            <span style={{ fontSize: '10px', opacity: 0.8, display: 'block' }}>Sisa Kalender</span>
+            <span className="mono" style={{ fontSize: '12px', fontWeight: 700 }}>{daysRemaining} Hari</span>
+          </div>
+        </div>
 
         {isOverSafeLimit && (
-          <div className="badge badge-red" style={{ marginTop: '6px', display: 'flex', alignItems: 'center', gap: '3px' }}>
-            <AlertCircle size={11} /> Hari ini ({formatIDR(todayExpensesSum)}) melampaui limit aman!
+          <div style={{ marginTop: '10px', padding: '6px 8px', background: 'rgba(0,0,0,0.3)', borderRadius: '8px', fontSize: '10px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <AlertCircle size={12} color="#f43f5e" /> Pengeluaran hari ini ({formatIDR(todayExpensesSum)}) melebihi limit harian!
           </div>
         )}
+      </div>
 
-        <button className="btn" style={{ marginTop: '10px' }} onClick={() => setIsModalOpen(true)}>
+      {/* Action Button & Stats */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '8px' }}>
+        <button className="btn" onClick={() => setIsModalOpen(true)} style={{ height: '100%' }}>
           <Plus size={14} /> Catat Pengeluaran
         </button>
-      </div>
 
-      {/* Stats Row */}
-      <div className="row">
         <div className="stat-card" style={{ position: 'relative' }}>
-          <span className="label">Uang Saku Bulanan</span>
+          <span className="label">Uang Saku (Edit)</span>
           <span className="h3 mono" style={{ color: '#818cf8', display: 'block', marginTop: '2px' }}>{formatIDR(totalAllowance)}</span>
-          <button onClick={() => setIsEditBudgetOpen(true)} className="icon-btn" style={{ position: 'absolute', top: '6px', right: '6px' }}>
-            <Edit2 size={12} color="#818cf8" />
+          <button onClick={() => setIsEditBudgetOpen(true)} className="icon-btn" style={{ position: 'absolute', top: '4px', right: '4px' }}>
+            <Edit2 size={11} color="#818cf8" />
           </button>
         </div>
-
-        <div className="stat-card">
-          <span className="label">Keluar Hari Ini</span>
-          <span className="h3 mono" style={{ color: isOverSafeLimit ? '#fb7185' : '#34d399', display: 'block', marginTop: '2px' }}>{formatIDR(todayExpensesSum)}</span>
-        </div>
       </div>
 
-      {/* Expense Outflow List with Delete CRUD */}
+      {/* Expense List */}
       <div className="card">
         <div className="section-row">
           <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <ShoppingBag size={15} color="#818cf8" /> Arus Kas Keluar
+            <ShoppingBag size={14} color="#818cf8" /> Arus Kas Keluar Harian
           </span>
           <span className="badge badge-blue">{expenses.length} Transaksi</span>
         </div>
@@ -158,6 +164,6 @@ export default function WalletTracker() {
         onClose={() => setIsModalOpen(false)}
         onAddExpense={handleAddExpense}
       />
-    </>
+    </div>
   );
 }
