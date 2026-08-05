@@ -20,81 +20,40 @@ export default function Login({ onLoginSuccess }) {
   };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: '#030712',
-      padding: '1.25rem'
-    }}>
-      <div style={{
-        maxWidth: '400px',
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        textAlign: 'center'
-      }}>
-        {/* Brand App Icon */}
-        <div style={{
-          width: '72px',
-          height: '72px',
-          borderRadius: '24px',
-          background: 'var(--accent-gradient)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          marginBottom: '1.5rem',
-          boxShadow: '0 10px 30px rgba(99, 102, 241, 0.4)'
-        }}>
-          <Rocket size={38} color="white" />
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-app)', padding: '16px' }}>
+      <div style={{ maxWidth: '360px', width: '100%', textAlign: 'center' }}>
+        <div className="icon-box" style={{ width: '56px', height: '56px', background: 'var(--g-indigo-cyan)', margin: '0 auto 12px', borderRadius: '18px', boxShadow: '0 8px 24px rgba(99,102,241,0.4)' }}>
+          <Rocket size={28} color="white" />
         </div>
 
-        <h1 style={{ fontSize: '2rem', fontWeight: 800, background: 'var(--accent-gradient)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', marginBottom: '0.25rem' }}>
-          Kating App
-        </h1>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '2.5rem' }}>
-          Asisten Akademik & Personal Mahasiswa
-        </p>
+        <h1 className="h1 grad-text" style={{ marginBottom: '2px' }}>Kating App</h1>
+        <p className="muted" style={{ marginBottom: '20px' }}>Asisten Akademik & Personal</p>
 
-        {/* Feature Pills */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem', width: '100%', marginBottom: '2.5rem', textAlign: 'left' }}>
-          <div style={{ backgroundColor: 'var(--bg-card)', padding: '0.75rem 1rem', borderRadius: '14px', border: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <BookOpen size={18} color="#818cf8" />
-            <span style={{ fontSize: '0.825rem', color: 'var(--text-primary)', fontWeight: 600 }}>Jadwal & Countdown Deadline</span>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '20px' }}>
+          <div className="list-item" style={{ flexDirection: 'column', alignItems: 'flex-start', padding: '10px' }}>
+            <BookOpen size={16} color="#818cf8" />
+            <span className="h4" style={{ marginTop: '4px' }}>Smart Dashboard</span>
           </div>
-          <div style={{ backgroundColor: 'var(--bg-card)', padding: '0.75rem 1rem', borderRadius: '14px', border: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <ShieldCheck size={18} color="#06b6d4" />
-            <span style={{ fontSize: '0.825rem', color: 'var(--text-primary)', fontWeight: 600 }}>Project Manager & Automated 0% Flagging</span>
+          <div className="list-item" style={{ flexDirection: 'column', alignItems: 'flex-start', padding: '10px' }}>
+            <ShieldCheck size={16} color="#22d3ee" />
+            <span className="h4" style={{ marginTop: '4px' }}>Project Manager</span>
           </div>
-          <div style={{ backgroundColor: 'var(--bg-card)', padding: '0.75rem 1rem', borderRadius: '14px', border: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <Wallet size={18} color="#f59e0b" />
-            <span style={{ fontSize: '0.825rem', color: 'var(--text-primary)', fontWeight: 600 }}>Wallet Tracker & Batas Aman Belanja</span>
+          <div className="list-item" style={{ flexDirection: 'column', alignItems: 'flex-start', padding: '10px' }}>
+            <Wallet size={16} color="#fbbf24" />
+            <span className="h4" style={{ marginTop: '4px' }}>Wallet Tracker</span>
           </div>
-          <div style={{ backgroundColor: 'var(--bg-card)', padding: '0.75rem 1rem', borderRadius: '14px', border: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <Award size={18} color="#10b981" />
-            <span style={{ fontSize: '0.825rem', color: 'var(--text-primary)', fontWeight: 600 }}>Brankas Prestasi & 1-Click ATS CV</span>
+          <div className="list-item" style={{ flexDirection: 'column', alignItems: 'flex-start', padding: '10px' }}>
+            <Award size={16} color="#34d399" />
+            <span className="h4" style={{ marginTop: '4px' }}>1-Click CV ATS</span>
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <button
-          onClick={handleGoogleLogin}
-          disabled={loading}
-          className="btn-minimal"
-          style={{ marginBottom: '0.75rem' }}
-        >
-          <LogIn size={18} />
-          {loading ? 'Menghubungkan...' : 'Masuk via Google Auth'}
+        <button onClick={handleGoogleLogin} disabled={loading} className="btn" style={{ marginBottom: '8px' }}>
+          <LogIn size={15} /> {loading ? 'Menghubungkan...' : 'Google Single Sign-On'}
         </button>
 
-        <button
-          onClick={handleDemoLogin}
-          className="btn-minimal-secondary"
-        >
-          <Sparkles size={16} color="#06b6d4" />
-          Masuk Mode Demo (Hafiz Kurniawan)
+        <button onClick={handleDemoLogin} className="btn-ghost">
+          <Sparkles size={14} color="#22d3ee" /> Mode Demo Instan
         </button>
       </div>
     </div>

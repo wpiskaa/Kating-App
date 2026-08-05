@@ -35,64 +35,38 @@ export default function ExpenseModal({ isOpen, onClose, onAddExpense }) {
   };
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal-sheet" onClick={(e) => e.stopPropagation()}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-          <h3 style={{ fontSize: '1.05rem', fontWeight: 700 }}>Catat Pengeluaran Cepat</h3>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--text-tertiary)', cursor: 'pointer' }}>
-            <X size={18} />
-          </button>
+    <div className="overlay" onClick={onClose}>
+      <div className="sheet" onClick={(e) => e.stopPropagation()}>
+        <div className="drag-handle" />
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+          <span className="h3">Tambah Transaksi</span>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--text-3)' }}><X size={16} /></button>
         </div>
 
-        {/* SRS Presets */}
-        <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', marginBottom: '1.15rem' }}>
-          <button type="button" className="pill-badge pill-info" onClick={() => setPreset('Warmindo Rutin', '18000', 'Makan & Minum', 'Warmindo War-Kun')}>
-            🍜 Warmindo (18k)
-          </button>
-          <button type="button" className="pill-badge pill-warning" onClick={() => setPreset('Kopi Jahat', '25000', 'Hiburan / Kopi', 'Kopi Jahat Tamantirto')}>
-            ☕ Kopi Jahat (25k)
-          </button>
+        <div style={{ display: 'flex', gap: '6px', marginBottom: '12px' }}>
+          <button type="button" className="badge badge-cyan" onClick={() => setPreset('Warmindo Rutin', '18000', 'Makan & Minum', 'Warmindo War-Kun')}>🍜 Warmindo (18k)</button>
+          <button type="button" className="badge badge-yellow" onClick={() => setPreset('Kopi Jahat', '25000', 'Hiburan / Kopi', 'Kopi Jahat Tamantirto')}>☕ Kopi Jahat (25k)</button>
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div className="form-field">
-            <label className="form-label-clean">Deskripsi Transaksi</label>
-            <input
-              type="text"
-              className="form-input-clean"
-              placeholder="Contoh: Makan Siang Warmindo"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-            />
+          <div className="field">
+            <label className="field-label">Deskripsi</label>
+            <input type="text" className="field-input" placeholder="Makan Siang Warmindo" value={title} onChange={(e) => setTitle(e.target.value)} required />
           </div>
 
-          <div className="form-field">
-            <label className="form-label-clean">Nominal (Rp)</label>
-            <input
-              type="number"
-              className="form-input-clean"
-              placeholder="18000"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              required
-            />
+          <div className="field">
+            <label className="field-label">Nominal (Rp)</label>
+            <input type="number" className="field-input" placeholder="18000" value={amount} onChange={(e) => setAmount(e.target.value)} required />
           </div>
 
-          <div className="form-field">
-            <label className="form-label-clean">Lokasi</label>
-            <input
-              type="text"
-              className="form-input-clean"
-              placeholder="Warmindo War-Kun"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-            />
+          <div className="field">
+            <label className="field-label">Lokasi</label>
+            <input type="text" className="field-input" placeholder="Warmindo War-Kun" value={location} onChange={(e) => setLocation(e.target.value)} />
           </div>
 
-          <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem' }}>
-            <button type="button" className="btn-minimal-secondary" onClick={onClose}>Batal</button>
-            <button type="submit" className="btn-minimal">Simpan</button>
+          <div style={{ display: 'flex', gap: '8px', marginTop: '14px' }}>
+            <button type="button" className="btn-ghost" onClick={onClose}>Batal</button>
+            <button type="submit" className="btn">Simpan</button>
           </div>
         </form>
       </div>

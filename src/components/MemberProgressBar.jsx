@@ -11,47 +11,38 @@ export default function MemberProgressBar({ member, projectDeadline }) {
   const isFlaggedCritical = progressRatio === 0 && hoursUntilDeadline <= 24 && hoursUntilDeadline > 0;
 
   return (
-    <div
-      className={`card-clean ${isFlaggedCritical ? 'flag-critical-card' : ''}`}
-      style={{ padding: '0.85rem 1rem' }}
-    >
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.625rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
+    <div className={`card ${isFlaggedCritical ? 'critical-card' : ''}`} style={{ padding: '10px 12px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <img
             src={avatar}
             alt={name}
-            style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '50%',
-              objectFit: 'cover',
-              border: isFlaggedCritical ? '1.5px solid var(--accent-rose)' : '1.5px solid var(--border-subtle)'
-            }}
+            style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' }}
           />
           <div>
-            <h4 style={{ fontSize: '0.85rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-              {name}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <span className="h4">{name}</span>
               {isFlaggedCritical && (
-                <span className="pill-badge pill-danger" style={{ display: 'flex', alignItems: 'center', gap: '0.2rem' }}>
-                  <AlertCircle size={10} /> 0% FLAG
+                <span className="badge badge-red" style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+                  <AlertCircle size={9} /> 0% FLAG
                 </span>
               )}
-            </h4>
-            <span style={{ fontSize: '0.725rem', color: 'var(--text-tertiary)' }}>{role}</span>
+            </div>
+            <span className="dim">{role}</span>
           </div>
         </div>
 
-        <span style={{ fontSize: '0.875rem', fontWeight: 800, color: isFlaggedCritical ? '#fb7185' : '#34d399' }}>
+        <span className="mono h3" style={{ color: isFlaggedCritical ? '#fb7185' : '#34d399' }}>
           {progressRatio}%
         </span>
       </div>
 
-      <div className="progress-track">
+      <div className="pbar-track">
         <div
-          className="progress-fill"
+          className="pbar-fill"
           style={{
             width: `${progressRatio}%`,
-            background: isFlaggedCritical ? 'var(--accent-rose)' : 'var(--accent-gradient)'
+            background: isFlaggedCritical ? 'var(--g-rose)' : 'var(--g-indigo-cyan)'
           }}
         />
       </div>

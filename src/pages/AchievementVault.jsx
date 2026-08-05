@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import UploadForm from '../components/UploadForm';
 import { generateATSCV } from '../utils/pdfEngine';
-import { Award, FileText, Download, Plus, Sparkles, Trash2 } from 'lucide-react';
+import { Award, FileText, Plus, Sparkles, Trash2 } from 'lucide-react';
 
 export default function AchievementVault({ currentUser }) {
   const [achievements, setAchievements] = useState([
@@ -53,59 +53,45 @@ export default function AchievementVault({ currentUser }) {
 
   return (
     <>
-      <div className="card-clean" style={{
-        background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(6, 182, 212, 0.15) 100%)',
-        border: '1px solid var(--border-focus)'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.2rem' }}>
-          <Award size={18} color="#818cf8" />
-          <h2 style={{ fontSize: '1.05rem', fontWeight: 800 }}>Brankas & 1-Click CV ATS</h2>
+      <div className="card-hero" style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.15) 0%, rgba(34,211,238,0.1) 100%)', border: '1px solid rgba(99,102,241,0.25)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+          <Award size={16} color="#818cf8" />
+          <h2 className="h3">Brankas & 1-Click CV ATS</h2>
         </div>
-        <p style={{ fontSize: '0.725rem', color: 'var(--text-secondary)', marginBottom: '0.75rem' }}>
-          Ekstrak metadata ke Resume ATS berformat PDF (FR-5.3).
-        </p>
+        <span className="dim">Ekstrak otomatis metadata ke PDF Resume ATS (FR-5.3)</span>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          <button className="btn-minimal" onClick={handle1ClickCVExport} disabled={isExporting}>
-            <Sparkles size={15} />
-            {isExporting ? 'Meramu PDF ATS...' : '1-Click Ekspor CV ATS (PDF)'}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px', marginTop: '10px' }}>
+          <button className="btn" onClick={handle1ClickCVExport} disabled={isExporting}>
+            <Sparkles size={13} /> {isExporting ? 'Proses...' : 'Ekspor CV (PDF)'}
           </button>
-          <button className="btn-minimal-secondary" onClick={() => setIsModalOpen(true)}>
-            <Plus size={15} /> Unggah Metadata Prestasi
+          <button className="btn-ghost" onClick={() => setIsModalOpen(true)}>
+            <Plus size={13} /> Unggah Metadata
           </button>
         </div>
       </div>
 
-      <div className="card-clean">
-        <div className="card-clean-title">
-          <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-            <FileText size={16} color="#06b6d4" /> Rekam Jejak Prestasi
+      <div className="card">
+        <div className="section-row">
+          <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+            <FileText size={15} color="#22d3ee" /> Rekam Jejak
           </span>
-          <span className="pill-badge pill-info">{achievements.length} Berkas</span>
+          <span className="badge badge-cyan">{achievements.length} Berkas</span>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
           {achievements.map((item) => (
-            <div
-              key={item.id}
-              style={{
-                backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                border: '1px solid var(--border-subtle)',
-                borderRadius: 'var(--radius-inner)',
-                padding: '0.75rem 0.85rem'
-              }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.25rem' }}>
-                <span className="pill-badge pill-info">{item.category}</span>
-                <button onClick={() => handleDeleteAchievement(item.id)} style={{ background: 'none', border: 'none', color: '#fb7185', cursor: 'pointer' }}>
-                  <Trash2 size={13} />
-                </button>
+            <div key={item.id} className="list-item">
+              <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  <span className="h4">{item.title}</span>
+                  <span className="badge badge-cyan">{item.category}</span>
+                </div>
+                <span className="dim">{item.role} • {item.institution} ({item.date})</span>
               </div>
 
-              <h4 style={{ fontSize: '0.875rem', fontWeight: 700, marginBottom: '0.15rem' }}>{item.title}</h4>
-              <p style={{ fontSize: '0.725rem', color: 'var(--text-secondary)' }}>
-                {item.role} • {item.institution} ({item.date})
-              </p>
+              <button onClick={() => handleDeleteAchievement(item.id)} style={{ background: 'none', border: 'none', color: '#fb7185', cursor: 'pointer' }}>
+                <Trash2 size={13} />
+              </button>
             </div>
           ))}
         </div>

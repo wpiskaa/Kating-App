@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import ScheduleList from '../components/ScheduleList';
 import CountdownWidget from '../components/CountdownWidget';
-import { BookOpen, Clock, TrendingUp, Sparkles } from 'lucide-react';
+import { BookOpen, Clock, TrendingUp, Sparkles, Award } from 'lucide-react';
 
 export default function Dashboard({ user }) {
   const [schedules] = useState([
@@ -11,72 +11,63 @@ export default function Dashboard({ user }) {
   ]);
 
   const [tasks] = useState([
-    { id: 101, title: "Laporan Riset PAB Multi-Spectral", subject: "PAB", code: "PAB2026", category: "Kelompok", deadline: new Date(Date.now() + 14 * 3600 * 1000).toISOString() },
+    { id: 101, title: "Riset PAB Multi-Spectral", subject: "PAB", code: "PAB2026", category: "Kelompok", deadline: new Date(Date.now() + 14 * 3600 * 1000).toISOString() },
     { id: 102, title: "Tugas Mandiri Diagram UML", subject: "PBO", code: "PBO2026", category: "Individu", deadline: new Date(Date.now() + 48 * 3600 * 1000).toISOString() }
   ]);
 
   return (
     <>
-      {/* Clean User Banner */}
-      <div className="card-clean" style={{
-        background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(17, 24, 39, 0.95) 100%)',
-        border: '1px solid var(--border-focus)'
-      }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      {/* Profile Mini Banner */}
+      <div className="card-hero" style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #111827 100%)', border: '1px solid rgba(99,102,241,0.25)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
-            <span style={{ fontSize: '0.675rem', color: '#818cf8', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              Academic Dashboard
-            </span>
-            <h2 style={{ fontSize: '1.15rem', fontWeight: 800, marginTop: '0.1rem' }}>
-              Hai, {user?.displayName ? user.displayName.split(' ')[0] : 'Hafiz'} 👋
-            </h2>
-            <p style={{ fontSize: '0.725rem', color: 'var(--text-secondary)', marginTop: '0.15rem' }}>
-              {user?.prodi || 'Teknologi Informasi'} • Sem {user?.semester || 6}
-            </p>
+            <span className="label" style={{ color: '#818cf8' }}>Academic Dasbor</span>
+            <h2 className="h2" style={{ marginTop: '2px' }}>Hai, {user?.displayName?.split(' ')[0] || 'Hafiz'} 👋</h2>
+            <span className="muted">{user?.prodi || 'Teknologi Informasi'} • Sem {user?.semester || 6}</span>
           </div>
-          <div style={{ background: 'rgba(99, 102, 241, 0.15)', padding: '0.5rem', borderRadius: '12px' }}>
+          <div className="icon-box" style={{ background: 'rgba(99,102,241,0.15)' }}>
             <Sparkles size={18} color="#818cf8" />
           </div>
         </div>
       </div>
 
-      {/* Metrics Row */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.625rem' }}>
-        <div className="card-clean" style={{ padding: '0.75rem 0.85rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+      {/* 2 Stat Cards */}
+      <div className="row">
+        <div className="stat-card">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
             <TrendingUp size={14} color="#34d399" />
-            <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>Target IPK</span>
+            <span className="label">IPK Target</span>
           </div>
-          <h3 style={{ fontSize: '1.15rem', fontWeight: 800, marginTop: '0.15rem' }}>3.88</h3>
+          <span className="h2 mono" style={{ display: 'block', marginTop: '4px' }}>3.88</span>
         </div>
 
-        <div className="card-clean" style={{ padding: '0.75rem 0.85rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+        <div className="stat-card">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
             <Clock size={14} color="#fb7185" />
-            <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>Deadline &lt;24j</span>
+            <span className="label">Tenggat &lt;24j</span>
           </div>
-          <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#fb7185', marginTop: '0.15rem' }}>1 Tugas</h3>
+          <span className="h2 mono" style={{ color: '#fb7185', display: 'block', marginTop: '4px' }}>1 Task</span>
         </div>
       </div>
 
-      {/* Countdown Widget Section */}
-      <div className="card-clean">
-        <div className="card-clean-title">
-          <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-            <Clock size={16} color="#06b6d4" /> Countdown Deadline
+      {/* Countdown Section */}
+      <div className="card">
+        <div className="section-row">
+          <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+            <Clock size={15} color="#22d3ee" /> Countdown Deadline
           </span>
-          <span className="pill-badge pill-danger">Live</span>
+          <span className="badge badge-red">Live</span>
         </div>
         <CountdownWidget tasks={tasks} />
       </div>
 
       {/* Schedule Section */}
-      <div className="card-clean">
-        <div className="card-clean-title">
-          <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-            <BookOpen size={16} color="#818cf8" /> Jadwal Hari Ini
+      <div className="card">
+        <div className="section-row">
+          <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+            <BookOpen size={15} color="#818cf8" /> Jadwal Hari Ini
           </span>
-          <span className="pill-badge pill-info">3 Matkul</span>
+          <span className="badge badge-blue">3 Matkul</span>
         </div>
         <ScheduleList schedules={schedules} />
       </div>

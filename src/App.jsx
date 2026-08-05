@@ -35,11 +35,11 @@ export default function App() {
 
   return (
     <Router>
-      <div className="app-viewport-wrapper">
-        <div className="mobile-app-shell">
-          <Navbar user={user} onLogout={handleLogout} />
+      <div className="viewport">
+        <div className="shell">
+          <Navbar user={user} />
           
-          <div className="page-container">
+          <main className="page">
             <Routes>
               <Route path="/" element={<Dashboard user={user} />} />
               <Route path="/projects" element={<ProjectWorkspace currentUser={user} />} />
@@ -48,7 +48,7 @@ export default function App() {
               <Route path="/profile" element={<ProfileSettings user={user} onLogout={handleLogout} />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
-          </div>
+          </main>
         </div>
       </div>
     </Router>

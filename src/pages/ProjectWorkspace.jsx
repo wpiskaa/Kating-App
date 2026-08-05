@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import MemberProgressBar from '../components/MemberProgressBar';
-import { Users, FolderGit2, CheckSquare, ShieldAlert } from 'lucide-react';
+import { FolderKanban, CheckSquare, ShieldAlert } from 'lucide-react';
 
 export default function ProjectWorkspace({ currentUser }) {
   const [projectDeadline] = useState(new Date(Date.now() + 18 * 3600 * 1000).toISOString());
@@ -12,14 +12,14 @@ export default function ProjectWorkspace({ currentUser }) {
   ]);
 
   const [subtasks, setSubtasks] = useState([
-    { id: 'st-1', title: 'UI Shell & Dynamic Countdown Widget', assignedTo: 'mem-1', completed: true },
-    { id: 'st-2', title: 'Integrasi Google Auth Firebase', assignedTo: 'mem-1', completed: true },
+    { id: 'st-1', title: 'UI Shell & Dynamic Countdown', assignedTo: 'mem-1', completed: true },
+    { id: 'st-2', title: 'Google Auth Firebase Client', assignedTo: 'mem-1', completed: true },
     { id: 'st-3', title: '1-Click ATS Resume Generator', assignedTo: 'mem-1', completed: false },
-    { id: 'st-4', title: 'Inisialisasi Firestore NoSQL', assignedTo: 'mem-2', completed: true },
-    { id: 'st-5', title: 'Penulisan firestore.rules Security', assignedTo: 'mem-2', completed: true },
-    { id: 'st-6', title: 'Skrip Cloud Functions Flagging', assignedTo: 'mem-2', completed: true },
-    { id: 'st-7', title: 'Skema Normalisasi Relasi Koleksi', assignedTo: 'mem-3', completed: false },
-    { id: 'st-8', title: 'Kamus Data Sub-tugas & Indexing', assignedTo: 'mem-3', completed: false }
+    { id: 'st-4', title: 'Firestore NoSQL Database', assignedTo: 'mem-2', completed: true },
+    { id: 'st-5', title: 'firestore.rules Security', assignedTo: 'mem-2', completed: true },
+    { id: 'st-6', title: 'Cloud Functions Flagging', assignedTo: 'mem-2', completed: true },
+    { id: 'st-7', title: 'Normalisasi Relasi Koleksi', assignedTo: 'mem-3', completed: false },
+    { id: 'st-8', title: 'Kamus Data & Indexing', assignedTo: 'mem-3', completed: false }
   ]);
 
   const handleToggleSubtask = (subtaskId, assignedMemberId) => {
@@ -45,22 +45,17 @@ export default function ProjectWorkspace({ currentUser }) {
 
   return (
     <>
-      <div className="card-clean" style={{
-        background: 'linear-gradient(135deg, rgba(244, 63, 94, 0.12) 0%, var(--bg-card) 100%)',
-        border: '1px solid rgba(244, 63, 94, 0.3)'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+      <div className="card-hero" style={{ background: 'linear-gradient(135deg, rgba(244,63,94,0.12) 0%, var(--bg-card) 100%)', border: '1px solid rgba(244,63,94,0.3)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <ShieldAlert size={18} color="#f43f5e" />
           <div>
-            <h2 style={{ fontSize: '1rem', fontWeight: 800 }}>Drama-Free Project Manager</h2>
-            <p style={{ fontSize: '0.725rem', color: '#fb7185' }}>
-              Tenggat Akhir Proyek: 18 Jam Lagi
-            </p>
+            <h2 className="h3">Drama-Free Project Manager</h2>
+            <span className="dim" style={{ color: '#fb7185' }}>Tenggat Akhir Proyek: 18 Jam Lagi</span>
           </div>
         </div>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
         {members.map((member) => (
           <MemberProgressBar
             key={member.id}
@@ -70,67 +65,43 @@ export default function ProjectWorkspace({ currentUser }) {
         ))}
       </div>
 
-      <div className="card-clean">
-        <div className="card-clean-title">
-          <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-            <FolderGit2 size={16} color="#06b6d4" /> Sub-Tugas Tim
+      <div className="card">
+        <div className="section-row">
+          <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+            <FolderKanban size={15} color="#22d3ee" /> Sub-Tugas Tim
           </span>
-          <span className="pill-badge pill-info">
+          <span className="badge badge-cyan">
             {subtasks.filter(t => t.completed).length}/{subtasks.length} Selesai
           </span>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
           {subtasks.map((task) => {
             const assignedMember = members.find(m => m.id === task.assignedTo);
             return (
               <div
                 key={task.id}
                 onClick={() => handleToggleSubtask(task.id, task.assignedTo)}
-                style={{
-                  padding: '0.65rem 0.85rem',
-                  borderRadius: 'var(--radius-inner)',
-                  backgroundColor: task.completed ? 'rgba(16, 185, 129, 0.06)' : 'rgba(255, 255, 255, 0.03)',
-                  border: task.completed ? '1px solid rgba(16, 185, 129, 0.25)' : '1px solid var(--border-subtle)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: '0.5rem',
-                  cursor: 'pointer'
-                }}
+                className="list-item"
+                style={{ cursor: 'pointer', opacity: task.completed ? 0.7 : 1 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', overflow: 'hidden' }}>
-                  <div style={{
-                    width: '18px',
-                    height: '18px',
-                    borderRadius: '5px',
-                    backgroundColor: task.completed ? 'var(--accent-emerald)' : 'transparent',
-                    border: task.completed ? 'none' : '1.5px solid var(--text-tertiary)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: 'white',
-                    flexShrink: 0
-                  }}>
-                    {task.completed && <CheckSquare size={12} />}
-                  </div>
-                  <span style={{
-                    fontSize: '0.8rem',
-                    fontWeight: 600,
-                    textDecoration: task.completed ? 'line-through' : 'none',
-                    color: task.completed ? 'var(--text-tertiary)' : 'var(--text-primary)',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis'
-                  }}>
-                    {task.title}
-                  </span>
+                <div style={{
+                  width: '16px', height: '16px', borderRadius: '4px',
+                  background: task.completed ? 'var(--emerald)' : 'transparent',
+                  border: task.completed ? 'none' : '1.5px solid var(--text-3)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', flexShrink: 0
+                }}>
+                  {task.completed && <CheckSquare size={11} />}
                 </div>
+
+                <span className="h4" style={{ flex: 1, textDecoration: task.completed ? 'line-through' : 'none' }}>
+                  {task.title}
+                </span>
 
                 <img
                   src={assignedMember?.avatar}
                   alt={assignedMember?.name}
-                  style={{ width: '20px', height: '20px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
+                  style={{ width: '18px', height: '18px', borderRadius: '50%', objectFit: 'cover' }}
                   title={assignedMember?.name}
                 />
               </div>

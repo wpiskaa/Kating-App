@@ -20,7 +20,7 @@ export default function CountdownWidget({ tasks }) {
     const target = new Date(deadlineStr).getTime();
     const diff = target - now;
 
-    if (diff <= 0) return { expired: true, text: "Waktu Habis!", hoursLeft: 0 };
+    if (diff <= 0) return { expired: true, text: "Habis!", hoursLeft: 0 };
 
     const totalSeconds = Math.floor(diff / 1000);
     const hours = Math.floor(totalSeconds / 3600);
@@ -30,57 +30,30 @@ export default function CountdownWidget({ tasks }) {
     const pad = (n) => String(n).padStart(2, '0');
     return {
       expired: false,
-      text: `${pad(hours)}j ${pad(minutes)}m ${pad(seconds)}d`,
+      text: `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`,
       hoursLeft: hours
     };
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
       {sortedTasks.map((task) => {
         const timeObj = calculateTimeRemaining(task.deadline);
         const isUrgent = !timeObj.expired && timeObj.hoursLeft < 24;
 
         return (
-          <div
-            key={task.id}
-            style={{
-              padding: '0.85rem 1rem',
-              borderRadius: 'var(--radius-inner)',
-              backgroundColor: isUrgent ? 'rgba(244, 63, 94, 0.08)' : 'rgba(255, 255, 255, 0.03)',
-              border: isUrgent ? '1px solid rgba(244, 63, 94, 0.3)' : '1px solid var(--border-subtle)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '0.75rem'
-            }}
-          >
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.15rem' }}>
-                <h4 style={{ fontSize: '0.85rem', fontWeight: 700 }}>{task.title}</h4>
-                <span className={`pill-badge ${task.category === 'Kelompok' ? 'pill-info' : 'pill-warning'}`}>
-                  {task.category}
-                </span>
+          <div key={task.id} className="list-item" style={{ borderLeft: isUrgent ? '3px solid #f43f5e' : '1px solid var(--border)' }}>
+            <div style={{ flex: 1 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <span className="h4">{task.title}</span>
+                <span className={`badge ${task.category === 'Kelompok' ? 'badge-cyan' : 'badge-yellow'}`}>{task.category}</span>
               </div>
-              <p style={{ fontSize: '0.725rem', color: 'var(--text-tertiary)' }}>{task.subject}</p>
+              <span className="dim">{task.subject}</span>
             </div>
 
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.35rem',
-              backgroundColor: isUrgent ? 'rgba(244, 63, 94, 0.15)' : 'rgba(255, 255, 255, 0.05)',
-              padding: '0.35rem 0.65rem',
-              borderRadius: 'var(--radius-pill)',
-              border: isUrgent ? '1px solid rgba(244, 63, 94, 0.3)' : '1px solid var(--border-subtle)'
-            }}>
-              {isUrgent ? <AlertCircle size={13} color="#f43f5e" /> : <Clock size={13} color="#06b6d4" />}
-              <span style={{
-                fontSize: '0.8rem',
-                fontWeight: 700,
-                fontFamily: 'JetBrains Mono, monospace',
-                color: isUrgent ? '#fb7185' : '#38bdf8'
-              }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              {isUrgent ? <AlertCircle size={12} color="#f43f5e" /> : <Clock size={12} color="#22d3ee" />}
+              <span className="mono" style={{ fontSize: '11px', fontWeight: 700, color: isUrgent ? '#fb7185' : '#22d3ee' }}>
                 {timeObj.text}
               </span>
             </div>

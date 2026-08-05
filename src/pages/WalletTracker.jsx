@@ -28,114 +28,67 @@ export default function WalletTracker() {
 
   return (
     <>
-      <div className={`card-clean ${isOverSafeLimit ? 'wallet-alert-card' : ''}`}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-            <Wallet size={16} color={isOverSafeLimit ? '#f43f5e' : '#818cf8'} />
-            <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
-              Batas Aman Belanja Harian (FR-3.3)
-            </span>
+      <div className={`card ${isOverSafeLimit ? 'wallet-over' : ''}`}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <Wallet size={15} color={isOverSafeLimit ? '#f43f5e' : '#818cf8'} />
+            <span className="label">Batas Aman Harian (FR-3.3)</span>
           </div>
-          <span className={`pill-badge ${isOverSafeLimit ? 'pill-danger' : 'pill-success'}`}>
+          <span className={`badge ${isOverSafeLimit ? 'badge-red' : 'badge-green'}`}>
             {isOverSafeLimit ? 'Over Limit' : 'Aman'}
           </span>
         </div>
 
-        <h2 style={{
-          fontSize: '1.6rem',
-          fontWeight: 800,
-          color: isOverSafeLimit ? '#fb7185' : '#38bdf8',
-          fontFamily: 'JetBrains Mono, monospace',
-          lineHeight: 1.1
-        }}>
-          {formatIDR(safeDailyBudget)} <span style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)' }}>/ Hari</span>
+        <h2 className="mono h1" style={{ color: isOverSafeLimit ? '#fb7185' : '#22d3ee', fontSize: '22px' }}>
+          {formatIDR(safeDailyBudget)} <span className="dim" style={{ fontSize: '11px' }}>/ Hari</span>
         </h2>
 
-        <p style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', marginTop: '0.25rem' }}>
+        <span className="dim" style={{ display: 'block', marginTop: '2px' }}>
           Saldo {formatIDR(currentBalance)} • {daysRemaining} Sisa Hari
-        </p>
+        </span>
 
         {isOverSafeLimit && (
-          <div style={{
-            marginTop: '0.625rem',
-            padding: '0.45rem 0.65rem',
-            backgroundColor: 'rgba(244, 63, 94, 0.15)',
-            border: '1px solid rgba(244, 63, 94, 0.3)',
-            borderRadius: 'var(--radius-inner)',
-            color: '#fb7185',
-            fontSize: '0.725rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.35rem'
-          }}>
-            <AlertCircle size={13} />
-            <span>Pengeluaran hari ini ({formatIDR(todayExpensesSum)}) melebihi Batas Aman!</span>
+          <div className="badge badge-red" style={{ marginTop: '6px', display: 'flex', alignItems: 'center', gap: '3px' }}>
+            <AlertCircle size={11} /> Hari ini ({formatIDR(todayExpensesSum)}) melampaui limit aman!
           </div>
         )}
 
-        <div style={{ marginTop: '0.85rem' }}>
-          <button className="btn-minimal" onClick={() => setIsModalOpen(true)}>
-            <Plus size={16} /> Catat Pengeluaran
-          </button>
+        <button className="btn" style={{ marginTop: '10px' }} onClick={() => setIsModalOpen(true)}>
+          <Plus size={14} /> Catat Pengeluaran
+        </button>
+      </div>
+
+      <div className="row">
+        <div className="stat-card">
+          <span className="label">Total Saldo</span>
+          <span className="h3 mono" style={{ color: '#22d3ee', display: 'block', marginTop: '2px' }}>{formatIDR(currentBalance)}</span>
+        </div>
+
+        <div className="stat-card">
+          <span className="label">Keluar Hari Ini</span>
+          <span className="h3 mono" style={{ color: isOverSafeLimit ? '#fb7185' : '#34d399', display: 'block', marginTop: '2px' }}>{formatIDR(todayExpensesSum)}</span>
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.625rem' }}>
-        <div className="card-clean" style={{ padding: '0.75rem 0.85rem' }}>
-          <span style={{ fontSize: '0.675rem', color: 'var(--text-tertiary)' }}>Total Saldo</span>
-          <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#38bdf8', marginTop: '0.1rem' }}>
-            {formatIDR(currentBalance)}
-          </h3>
-        </div>
-
-        <div className="card-clean" style={{ padding: '0.75rem 0.85rem' }}>
-          <span style={{ fontSize: '0.675rem', color: 'var(--text-tertiary)' }}>Keluar Hari Ini</span>
-          <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: isOverSafeLimit ? '#fb7185' : '#34d399', marginTop: '0.1rem' }}>
-            {formatIDR(todayExpensesSum)}
-          </h3>
-        </div>
-      </div>
-
-      <div className="card-clean">
-        <div className="card-clean-title">
-          <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-            <ShoppingBag size={16} color="#818cf8" /> Arus Kas Keluar Harian
+      <div className="card">
+        <div className="section-row">
+          <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+            <ShoppingBag size={15} color="#818cf8" /> Arus Kas Keluar
           </span>
-          <span className="pill-badge pill-info">{expenses.length} Transaksi</span>
+          <span className="badge badge-blue">{expenses.length} Transaksi</span>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
           {expenses.map((item) => (
-            <div
-              key={item.id}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '0.65rem 0.85rem',
-                borderRadius: 'var(--radius-inner)',
-                backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                border: '1px solid var(--border-subtle)'
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <div style={{
-                  background: 'rgba(244, 63, 94, 0.12)',
-                  padding: '0.35rem',
-                  borderRadius: '8px',
-                  color: '#fb7185'
-                }}>
-                  <ArrowDownRight size={15} />
-                </div>
-                <div>
-                  <h4 style={{ fontSize: '0.825rem', fontWeight: 700 }}>{item.title}</h4>
-                  <span style={{ fontSize: '0.675rem', color: 'var(--text-tertiary)' }}>{item.location}</span>
-                </div>
+            <div key={item.id} className="list-item">
+              <div className="icon-box-sm" style={{ background: 'rgba(244,63,94,0.12)', color: '#fb7185' }}>
+                <ArrowDownRight size={14} />
               </div>
-
-              <span style={{ fontSize: '0.85rem', fontWeight: 800, color: '#fb7185', fontFamily: 'JetBrains Mono, monospace' }}>
-                -{formatIDR(item.amount)}
-              </span>
+              <div style={{ flex: 1 }}>
+                <span className="h4">{item.title}</span>
+                <span className="dim" style={{ display: 'block' }}>{item.location}</span>
+              </div>
+              <span className="mono h4" style={{ color: '#fb7185' }}>-{formatIDR(item.amount)}</span>
             </div>
           ))}
         </div>
