@@ -8,10 +8,10 @@ export default function Dashboard({ user }) {
   const [gpa, setGpa] = useState('3.88');
   const [isGPAModalOpen, setIsGPAModalOpen] = useState(false);
 
-  // General Read-Only Overview Data (Zero Input Forms on Dashboard)
+  // Pure Read-Only Overview Data
   const [schedules] = useState([
-    { id: 1, subject: "Pemrograman Objek", time: "08:00 - 10:30", room: "Lab Komputer", lecturer: "Dosen Pengampu", sks: 3, status: "Completed" },
-    { id: 2, subject: "Aplikasi Bergerak", time: "10:45 - 13:15", room: "Ruang Teori", lecturer: "Ahmad Wijaya", sks: 3, status: "Ongoing" }
+    { id: 1, subject: "Pemrograman Objek", time: "08:00 - 10:30", room: "Lab Komputer 3", lecturer: "Dosen Pengampu", sks: 3, status: "Completed" },
+    { id: 2, subject: "Aplikasi Bergerak", time: "10:45 - 13:15", room: "Ruang Teori 402", lecturer: "Ahmad Wijaya", sks: 3, status: "Ongoing" }
   ]);
 
   const [tasks] = useState([
@@ -21,13 +21,13 @@ export default function Dashboard({ user }) {
 
   return (
     <>
-      {/* Greeting Banner */}
-      <div className="card-hero" style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%)', border: '1px solid rgba(99,102,241,0.3)', padding: '14px' }}>
+      {/* Sleek Profile Banner */}
+      <div className="card-hero" style={{ background: 'var(--g-card-hero)', border: '1px solid rgba(99,102,241,0.25)' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
             <span className="label" style={{ color: '#818cf8' }}>Asisten Mahasiswa</span>
-            <h2 className="h2" style={{ fontSize: '15px', marginTop: '2px' }}>Hai, {user?.displayName?.split(' ')[0] || 'Hafiz'} ✨</h2>
-            <span className="muted">{user?.prodi || 'Teknologi Informasi'} • Sem {user?.semester || 6}</span>
+            <h2 className="h2" style={{ fontSize: '16px', marginTop: '2px' }}>Hai, {user?.displayName?.split(' ')[0] || 'Hafiz'} ✨</h2>
+            <span className="muted">{user?.prodi || 'Teknologi Informasi'} • Semester {user?.semester || 6}</span>
           </div>
 
           <div className="icon-box-sm" style={{ background: 'rgba(99,102,241,0.2)' }}>
@@ -36,11 +36,11 @@ export default function Dashboard({ user }) {
         </div>
       </div>
 
-      {/* General Student Tips / Opportunity Card (Universal Mahasiswa) */}
-      <div className="card" style={{ background: 'linear-gradient(135deg, rgba(34,211,238,0.08) 0%, var(--bg-card) 100%)', padding: '10px 12px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      {/* Universal Student Tips Card */}
+      <div className="card" style={{ background: 'linear-gradient(135deg, rgba(34,211,238,0.08) 0%, var(--bg-card) 100%)', border: '1px solid rgba(34,211,238,0.2)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div className="icon-box-sm" style={{ background: 'rgba(34,211,238,0.15)', color: '#22d3ee' }}>
-            <Compass size={14} />
+            <Compass size={15} />
           </div>
           <div>
             <span className="h4" style={{ color: '#22d3ee' }}>Peluang & Tips Mahasiswa:</span>
@@ -49,7 +49,7 @@ export default function Dashboard({ user }) {
         </div>
       </div>
 
-      {/* Stats Row with Interactive GPA Target Calculator Trigger */}
+      {/* Stats Row with GPA Calculator Trigger */}
       <div className="row">
         <div className="stat-card" onClick={() => setIsGPAModalOpen(true)} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -61,7 +61,7 @@ export default function Dashboard({ user }) {
               <span className="h3 mono" style={{ display: 'block', color: '#34d399' }}>{gpa}</span>
             </div>
           </div>
-          <Calculator size={12} color="var(--text-3)" />
+          <Calculator size={13} color="var(--text-3)" />
         </div>
 
         <div className="stat-card" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -78,7 +78,7 @@ export default function Dashboard({ user }) {
       {/* Countdown Section */}
       <div className="card">
         <div className="section-row">
-          <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+          <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <Zap size={14} color="#22d3ee" /> Countdown Tenggat
           </span>
           <span className="badge badge-red">Live Ticker</span>
@@ -89,7 +89,7 @@ export default function Dashboard({ user }) {
       {/* Schedule Section */}
       <div className="card">
         <div className="section-row">
-          <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+          <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <BookOpen size={14} color="#818cf8" /> Jadwal Perkuliahan Hari Ini
           </span>
           <span className="badge badge-blue">2 Matkul</span>

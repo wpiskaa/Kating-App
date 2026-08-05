@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { UserCheck, Shield, Moon, Sun, Bell, RefreshCw, LogOut, CheckCircle2, ChevronRight, Sliders, Edit2, X, PlusCircle, BookOpen, CheckSquare, Camera, Upload } from 'lucide-react';
+import { UserCheck, Shield, Moon, Sun, Bell, RefreshCw, LogOut, CheckCircle2, ChevronRight, Sliders, Edit2, X, PlusCircle, BookOpen, CheckSquare, Camera, Upload, Award, FileText, Sparkles, Trash2, Plus, Eye } from 'lucide-react';
 import { logoutUser } from '../services/authService';
+import { generateATSCV } from '../utils/pdfEngine';
 import ScheduleModal from '../components/ScheduleModal';
 import TaskModal from '../components/TaskModal';
+import UploadForm from '../components/UploadForm';
 
 export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, onAddSchedule, onAddTask }) {
   const [notifications, setNotifications] = useState(true);
@@ -11,11 +13,38 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [isCVModalOpen, setIsCVModalOpen] = useState(false);
+  const [isUploadOpen, setIsUploadOpen] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   const [displayName, setDisplayName] = useState(user?.displayName || 'Hafiz Kurniawan');
   const [prodi, setProdi] = useState(user?.prodi || 'Teknologi Informasi');
   const [semester, setSemester] = useState(user?.semester || 6);
   const [photoURL, setPhotoURL] = useState(user?.photoURL || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80');
+
+  // Achievements State (CV ATS Engine)
+  const [achievements, setAchievements] = useState([
+    {
+      id: 'ach-1',
+      title: 'Kepanitiaan IT Specta 2026',
+      role: 'Koordinator Software',
+      institution: 'HMTI UMY',
+      date: 'Mei 2026',
+      category: 'Kepanitiaan',
+      description: 'Memimpin tim pengembang aplikasi pendaftaran peserta online.',
+      fileName: 'SK_Kepanitiaan_IT_Specta.pdf'
+    },
+    {
+      id: 'ach-2',
+      title: 'Riset Deteksi Golongan Darah',
+      role: 'Ketua Peneliti',
+      institution: 'Lab Sistem Terintegrasi',
+      date: 'Juli 2026',
+      category: 'Riset & Inovasi',
+      description: 'Finalisasi berkas riset inovasi alat pendeteksi golongan darah portabel.',
+      fileName: 'Berkas_Finalisasi_Riset.pdf'
+    }
+  ]);
 
   const handleResetData = () => {
     localStorage.clear();
@@ -44,25 +73,46 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
     window.location.reload();
   };
 
+  const handle1ClickCVExport = () => {
+    setIsExporting(true);
+    setTimeout(() => {
+      try {
+        generateATSCV(user, achievements);
+      } catch (err) {
+        console.error("PDF Export error:", err);
+      } finally {
+        setIsExporting(false);
+      }
+    }, 400);
+  };
+
+  const handleAddAchievement = (newAch) => {
+    setAchievements([newAch, ...achievements]);
+  };
+
+  const handleDeleteAchievement = (id) => {
+    setAchievements(achievements.filter(a => a.id !== id));
+  };
+
   return (
     <>
-      {/* Profile Card */}
+      {/* Profile Header Card */}
       <div className="card" style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(34,211,238,0.08) 100%)' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{ position: 'relative' }}>
               <img
                 src={photoURL}
                 alt={displayName}
-                style={{ width: '44px', height: '44px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--indigo)' }}
+                style={{ width: '46px', height: '46px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--indigo)' }}
               />
-              <label htmlFor="profile-photo-input" style={{
+              <label htmlFor="profile-photo-input-main" style={{
                 position: 'absolute', bottom: -2, right: -2, background: 'var(--indigo)', color: 'white',
                 borderRadius: '50%', padding: '3px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center'
               }}>
                 <Camera size={10} />
               </label>
-              <input type="file" id="profile-photo-input" accept="image/*" style={{ display: 'none' }} onChange={handlePhotoUpload} />
+              <input type="file" id="profile-photo-input-main" accept="image/*" style={{ display: 'none' }} onChange={handlePhotoUpload} />
             </div>
 
             <div>
@@ -85,6 +135,29 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
           <CheckCircle2 size={12} /> {demoResetMsg}
         </div>
       )}
+
+      {/* CV ATS & Brankas Prestasi Section (Disimpan di Profil) */}
+      <div className="card" style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.1) 0%, rgba(34,211,238,0.06) 100%)' }}>
+        <div className="section-row">
+          <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+            <Award size={15} color="#818cf8" /> Brankas Prestasi & CV ATS
+          </span>
+          <span className="badge badge-cyan">{achievements.length} Dokumen</span>
+        </div>
+
+        <p className="dim" style={{ marginBottom: '10px' }}>
+          Ekstrak otomatis metadata prestasi ke format PDF Resume ATS-friendly.
+        </p>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '6px' }}>
+          <button className="btn" onClick={handle1ClickCVExport} disabled={isExporting}>
+            <Sparkles size={13} /> {isExporting ? 'Proses...' : 'Ekspor CV ATS (PDF)'}
+          </button>
+          <button className="btn-ghost" onClick={() => setIsCVModalOpen(true)}>
+            <FileText size={13} /> Kelola Prestasi
+          </button>
+        </div>
+      </div>
 
       {/* Central Input Management Section */}
       <div className="card">
@@ -165,6 +238,43 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
         </div>
       </div>
 
+      {/* CV ATS Manager Modal inside Profile */}
+      {isCVModalOpen && (
+        <div className="overlay" onClick={() => setIsCVModalOpen(false)}>
+          <div className="sheet" onClick={(e) => e.stopPropagation()}>
+            <div className="drag-handle" />
+            <div className="section-row">
+              <span className="h3">Kelola Brankas & Rekam Jejak CV ATS</span>
+              <button onClick={() => setIsCVModalOpen(false)} className="icon-btn"><X size={16} /></button>
+            </div>
+
+            <button className="btn" style={{ marginBottom: '10px' }} onClick={() => setIsUploadOpen(true)}>
+              <Plus size={13} /> Unggah Metadata Prestasi Baru
+            </button>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', margin: '8px 0' }}>
+              {achievements.map((item) => (
+                <div key={item.id} className="list-item">
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <span className="h4">{item.title}</span>
+                      <span className="badge badge-cyan">{item.category}</span>
+                    </div>
+                    <span className="dim">{item.role} • {item.institution} ({item.date})</span>
+                  </div>
+
+                  <button onClick={() => handleDeleteAchievement(item.id)} className="icon-btn">
+                    <Trash2 size={13} color="#fb7185" />
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            <button className="btn-ghost" onClick={() => setIsCVModalOpen(false)}>Selesai</button>
+          </div>
+        </div>
+      )}
+
       {/* Edit Profile Modal */}
       {isEditingProfile && (
         <div className="overlay" onClick={() => setIsEditingProfile(false)}>
@@ -179,10 +289,10 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
               <div style={{ textAlign: 'center', marginBottom: '12px' }}>
                 <img src={photoURL} alt="Avatar" style={{ width: '56px', height: '56px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--indigo)', marginBottom: '6px' }} />
                 <div>
-                  <label htmlFor="photo-file-upload" className="badge badge-cyan" style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                  <label htmlFor="photo-file-upload-modal" className="badge badge-cyan" style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                     <Upload size={10} /> Unggah Foto Baru
                   </label>
-                  <input type="file" id="photo-file-upload" accept="image/*" style={{ display: 'none' }} onChange={handlePhotoUpload} />
+                  <input type="file" id="photo-file-upload-modal" accept="image/*" style={{ display: 'none' }} onChange={handlePhotoUpload} />
                 </div>
               </div>
 
@@ -208,9 +318,10 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
         </div>
       )}
 
-      {/* Modals for Centralized Input */}
+      {/* Modals for Centralized Input & Upload */}
       <ScheduleModal isOpen={isScheduleModalOpen} onClose={() => setIsScheduleModalOpen(false)} onAddSchedule={onAddSchedule} />
       <TaskModal isOpen={isTaskModalOpen} onClose={() => setIsTaskModalOpen(false)} onAddTask={onAddTask} />
+      <UploadForm isOpen={isUploadOpen} onClose={() => setIsUploadOpen(false)} onAddAchievement={handleAddAchievement} />
     </>
   );
 }
