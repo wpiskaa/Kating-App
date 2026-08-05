@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { UserCheck, Shield, Moon, Sun, Bell, RefreshCw, LogOut, CheckCircle2, ChevronRight, Sliders, Edit2, X, PlusCircle, BookOpen, CheckSquare, Camera, Upload, Award, FileText, Sparkles, Trash2, Plus, Calendar, ChevronUp, ChevronDown } from 'lucide-react';
+import { UserCheck, Shield, Moon, Sun, Bell, RefreshCw, LogOut, CheckCircle2, ChevronRight, Sliders, Edit2, X, PlusCircle, BookOpen, CheckSquare, Camera, Upload, Award, FileText, Sparkles, Trash2, Plus, Calendar, ChevronUp, ChevronDown, Activity, Clock } from 'lucide-react';
 import { logoutUser } from '../services/authService';
 import { generateATSCV } from '../utils/pdfEngine';
 import ScheduleModal from '../components/ScheduleModal';
 import TaskModal from '../components/TaskModal';
 import UploadForm from '../components/UploadForm';
 
-export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, onAddSchedule, onAddTask, availableCourses = [] }) {
+export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, onAddSchedule, onAddTask, availableCourses = [], activityLogs = [] }) {
   const [notifications, setNotifications] = useState(true);
   const [demoResetMsg, setDemoResetMsg] = useState('');
   
@@ -19,6 +19,7 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
   const [isExporting, setIsExporting] = useState(false);
 
   // Section Hide Toggles
+  const [hideActivityLog, setHideActivityLog] = useState(false);
   const [hideCVSection, setHideCVSection] = useState(false);
   const [hideInputSection, setHideInputSection] = useState(false);
   const [hideSettingsSection, setHideSettingsSection] = useState(false);
@@ -145,6 +146,41 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
           <CheckCircle2 size={12} /> {demoResetMsg}
         </div>
       )}
+
+      {/* Activity Log Section (Log Aktivitas Pengguna) */}
+      <div className="card">
+        <div className="section-row">
+          <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+            <Activity size={15} color="#34d399" /> Log Aktivitas Pengguna
+          </span>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span className="badge badge-green">{activityLogs.length} Aktivitas</span>
+            <button onClick={() => setHideActivityLog(!hideActivityLog)} className="icon-btn">
+              {hideActivityLog ? <ChevronDown size={13} /> : <ChevronUp size={13} />}
+            </button>
+          </div>
+        </div>
+
+        {!hideActivityLog && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', maxHeight: '180px', overflowY: 'auto' }}>
+            {activityLogs.length > 0 ? (
+              activityLogs.map((log) => (
+                <div key={log.id} className="list-item" style={{ padding: '6px 10px' }}>
+                  <Clock size={12} color="#818cf8" style={{ flexShrink: 0 }} />
+                  <div style={{ flex: 1 }}>
+                    <span className="h4" style={{ fontSize: '10px' }}>{log.action}</span>
+                    <span className="dim" style={{ display: 'block', fontSize: '8.5px' }}>{log.detail}</span>
+                  </div>
+                  <span className="dim" style={{ fontSize: '8.5px' }}>{log.time}</span>
+                </div>
+              ))
+            ) : (
+              <div className="dim" style={{ textAlign: 'center', padding: '10px' }}>Belum ada riwayat aktivitas.</div>
+            )}
+          </div>
+        )}
+      </div>
 
       {/* CV ATS & Brankas Prestasi Section */}
       <div className="card" style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.1) 0%, rgba(34,211,238,0.06) 100%)' }}>
@@ -277,7 +313,7 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
         </div>
       </div>
 
-      {/* FULL WEEKLY SCHEDULE VIEWER MODAL (Senin - Sabtu) */}
+      {/* FULL WEEKLY SCHEDULE VIEWER MODAL */}
       {isFullWeeklyScheduleOpen && (
         <div className="overlay" onClick={() => setIsFullWeeklyScheduleOpen(false)}>
           <div className="sheet" onClick={(e) => e.stopPropagation()}>
@@ -289,7 +325,6 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
               <button onClick={() => setIsFullWeeklyScheduleOpen(false)} className="icon-btn"><X size={16} /></button>
             </div>
 
-            {/* Day Selector Tabs */}
             <div style={{ display: 'flex', gap: '4px', marginBottom: '10px', overflowX: 'auto', paddingBottom: '4px' }}>
               {daysList.map(d => (
                 <button
@@ -303,7 +338,6 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
               ))}
             </div>
 
-            {/* Schedules for Selected Day */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', margin: '8px 0' }}>
               {availableCourses.filter(c => c.day === activeDayTab).length > 0 ? (
                 availableCourses.filter(c => c.day === activeDayTab).map(c => (
@@ -361,9 +395,6 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
                     <option key={s} value={s}>Semester {s}</option>
                   ))}
                 </select>
-                <span className="dim" style={{ display: 'block', marginTop: '3px' }}>
-                  Saat naik semester, matkul semester sebelumnya diarsip otomatis.
-                </span>
               </div>
 
               <div style={{ display: 'flex', gap: '6px', marginTop: '14px' }}>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, PlusCircle } from 'lucide-react';
+import { X } from 'lucide-react';
 
 export default function ExpenseModal({ isOpen, onClose, onAddExpense, categories = [] }) {
   const [title, setTitle] = useState('');
@@ -31,13 +31,6 @@ export default function ExpenseModal({ isOpen, onClose, onAddExpense, categories
     onClose();
   };
 
-  const setPreset = (pTitle, pAmount, pCategory, pLocation) => {
-    setTitle(pTitle);
-    setAmount(pAmount);
-    setCategorySelect(pCategory);
-    setLocation(pLocation);
-  };
-
   const defaultCategories = ['Makan & Minum', 'Hiburan / Kopi', 'Akademik', 'Transportasi', 'Kebutuhan Kos'];
   const allAvailableCategories = Array.from(new Set([...defaultCategories, ...categories]));
 
@@ -45,16 +38,9 @@ export default function ExpenseModal({ isOpen, onClose, onAddExpense, categories
     <div className="overlay" onClick={onClose}>
       <div className="sheet" onClick={(e) => e.stopPropagation()}>
         <div className="drag-handle" />
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
           <span className="h3">Catat Transaksi Pengeluaran</span>
           <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--text-3)' }}><X size={16} /></button>
-        </div>
-
-        {/* Quick Presets */}
-        <div style={{ display: 'flex', gap: '4px', marginBottom: '10px', flexWrap: 'wrap' }}>
-          <button type="button" className="badge badge-cyan" onClick={() => setPreset('Warmindo Rutin', '18000', 'Makan & Minum', 'Warmindo War-Kun')}>🍜 Warmindo (18k)</button>
-          <button type="button" className="badge badge-yellow" onClick={() => setPreset('Kopi & Tugas', '25000', 'Hiburan / Kopi', 'Kopi Jahat Tamantirto')}>☕ Kopi (25k)</button>
-          <button type="button" className="badge badge-blue" onClick={() => setPreset('Cetak Tugas Lab', '12000', 'Akademik', 'Fotocopy Kampus')}>📄 Print (12k)</button>
         </div>
 
         <form onSubmit={handleSubmit}>
@@ -78,7 +64,6 @@ export default function ExpenseModal({ isOpen, onClose, onAddExpense, categories
             </select>
           </div>
 
-          {/* Custom Category Input if selected */}
           {categorySelect === 'CUSTOM_NEW' && (
             <div className="field">
               <label className="field-label" style={{ color: 'var(--cyan)' }}>Nama Kategori Baru</label>

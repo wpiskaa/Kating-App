@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
+import Toast from './components/Toast';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import ProjectWorkspace from './pages/ProjectWorkspace';
@@ -10,7 +11,6 @@ import ChatWorkspace from './pages/ChatWorkspace';
 import ProfileSettings from './pages/ProfileSettings';
 import { getCurrentSessionUser, subscribeAuthChange, DEMO_USER } from './services/authService';
 
-// Default mock datasets for different semesters
 const DEFAULT_SEMESTER_DATASETS = {
   6: {
     schedules: [
@@ -19,17 +19,9 @@ const DEFAULT_SEMESTER_DATASETS = {
       { id: 603, day: "Kamis", semester: 6, subject: "Keamanan Jaringan", time: "14:00 - 16:30", room: "Ruang Teori 301", lecturer: "Siti Rahma", sks: 2, status: "Upcoming" }
     ],
     tasks: [
-      { id: 6101, title: "Riset Multi-Spectral Sensing", subject: "Aplikasi Bergerak", code: "PAB2026", category: "Kelompok", deadline: new Date(Date.now() + 14 * 3600 * 1000).toISOString() },
-      { id: 6102, title: "Tugas Mandiri Diagram UML", subject: "Pemrograman Objek", code: "PBO2026", category: "Mandiri", deadline: new Date(Date.now() + 48 * 3600 * 1000).toISOString() }
-    ]
-  },
-  3: {
-    schedules: [
-      { id: 301, day: "Senin", semester: 3, subject: "Ilmu Budaya Dasar (IBD)", time: "08:00 - 09:40", room: "R.201", lecturer: "Drs. H. Mulyadi", sks: 2, status: "Upcoming" },
-      { id: 302, day: "Rabu", semester: 3, subject: "Struktur Data & Algoritma", time: "10:00 - 12:30", room: "Lab 2", lecturer: "Rina Astuti, M.Cs.", sks: 3, status: "Upcoming" }
-    ],
-    tasks: [
-      { id: 3101, title: "Makalah Esai IBD Kebudayaan", subject: "Ilmu Budaya Dasar (IBD)", code: "IBD2025", category: "Mandiri", deadline: new Date(Date.now() + 72 * 3600 * 1000).toISOString() }
+      { id: 6101, title: "Riset Multi-Spectral Sensing", subject: "Aplikasi Bergerak", code: "PAB2026", category: "Kelompok", deadline: new Date(Date.now() + 14 * 3600 * 1000).toISOString(), completed: false },
+      { id: 6102, title: "Tugas Mandiri Diagram UML", subject: "Pemrograman Objek", code: "PBO2026", category: "Mandiri", deadline: new Date(Date.now() + 48 * 3600 * 1000).toISOString(), completed: false },
+      { id: 6103, title: "Praktikum Enkripsi AES", subject: "Keamanan Jaringan", code: "KJ2026", category: "Mandiri", deadline: new Date(Date.now() - 3600 * 1000).toISOString(), completed: false }
     ]
   }
 };
@@ -37,8 +29,34 @@ const DEFAULT_SEMESTER_DATASETS = {
 export default function App() {
   const [user, setUser] = useState(() => getCurrentSessionUser() || DEMO_USER);
   const [theme, setTheme] = useState(() => localStorage.getItem('kating_theme') || 'dark');
+  const [toast, setToast] = useState(null);
 
   const activeSemester = user?.semester || 6;
+
+  // Activity Logs System
+  const [activityLogs, setActivityLogs] = useState(() => {
+    const saved = localStorage.getItem('kating_activity_logs');
+    return saved ? JSON.parse(saved) : [
+      { id: 1, action: 'Memulai Sesi Demo', detail: 'Sistem Kating App berhasil diinisialisasi', time: '10m lalu' }
+    ];
+  });
+
+  const logActivity = (actionText, detailText) => {
+    const newLog = {
+      id: Date.now(),
+      action: actionText,
+      detail: detailText,
+      time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+    };
+
+    const updatedLogs = [newLog, ...activityLogs];
+    setActivityLogs(updatedLogs);
+    localStorage.setItem('kating_activity_logs', JSON.stringify(updatedLogs));
+  };
+
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type });
+  };
 
   // Semester Isolated Datasets Engine
   const [allSemesterSchedules, setAllSemesterSchedules] = useState(() => {
@@ -58,6 +76,7 @@ export default function App() {
 
   const toggleTheme = () => {
     setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+    showToast(`Mode tampilan diubah ke ${theme === 'dark' ? 'Light' : 'Dark'} Mode`);
   };
 
   useEffect(() => {
@@ -71,13 +90,14 @@ export default function App() {
 
   const handleLoginSuccess = (loggedInUser) => {
     setUser(loggedInUser);
+    showToast(`Selamat datang kembali, ${loggedInUser.displayName}!`);
+    logActivity('Login Berhasil', `Masuk ke akun ${loggedInUser.displayName}`);
   };
 
   const handleLogout = () => {
     setUser(null);
   };
 
-  // Get current active semester schedules & tasks
   const activeSchedules = allSemesterSchedules[activeSemester]?.schedules || [];
   const activeTasks = allSemesterTasks[activeSemester]?.tasks || [];
 
@@ -93,6 +113,8 @@ export default function App() {
 
     setAllSemesterSchedules(updatedAll);
     localStorage.setItem('kating_semester_schedules', JSON.stringify(updatedAll));
+    showToast(`Jadwal ${newSch.subject} (${newSch.day}) berhasil ditambahkan!`);
+    logActivity('Tambah Jadwal Kuliah', `${newSch.subject} pada hari ${newSch.day}`);
   };
 
   const handleAddTask = (newTask) => {
@@ -107,6 +129,8 @@ export default function App() {
 
     setAllSemesterTasks(updatedAll);
     localStorage.setItem('kating_semester_tasks', JSON.stringify(updatedAll));
+    showToast(`Tugas ${newTask.title} (${newTask.category}) berhasil disimpan!`);
+    logActivity('Tambah Tugas', `${newTask.title} [${newTask.category}]`);
   };
 
   return (
@@ -114,14 +138,15 @@ export default function App() {
       <div className="viewport">
         <div className="shell">
           <Navbar user={user} />
+          <Toast toast={toast} onClose={() => setToast(null)} />
           
           <main className="page">
             <Routes>
               <Route path="/" element={<Dashboard user={user} schedules={activeSchedules} tasks={activeTasks} />} />
-              <Route path="/projects" element={<ProjectWorkspace currentUser={user} availableCourses={activeSchedules} semesterTasks={activeTasks} />} />
-              <Route path="/wallet" element={<WalletTracker />} />
-              <Route path="/achievements" element={<AchievementVault currentUser={user} />} />
-              <Route path="/chat" element={<ChatWorkspace currentUser={user} />} />
+              <Route path="/projects" element={<ProjectWorkspace currentUser={user} availableCourses={activeSchedules} semesterTasks={activeTasks} onActionNotice={showToast} onLogAction={logActivity} />} />
+              <Route path="/wallet" element={<WalletTracker onActionNotice={showToast} onLogAction={logActivity} />} />
+              <Route path="/achievements" element={<AchievementVault currentUser={user} onActionNotice={showToast} onLogAction={logActivity} />} />
+              <Route path="/chat" element={<ChatWorkspace currentUser={user} onActionNotice={showToast} onLogAction={logActivity} />} />
               <Route
                 path="/profile"
                 element={
@@ -133,6 +158,7 @@ export default function App() {
                     onAddSchedule={handleAddSchedule}
                     onAddTask={handleAddTask}
                     availableCourses={activeSchedules}
+                    activityLogs={activityLogs}
                   />
                 }
               />
