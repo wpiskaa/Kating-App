@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
-import { UserCheck, Shield, Moon, Sun, Bell, RefreshCw, LogOut, CheckCircle2, ChevronRight, Sliders, Edit2, X } from 'lucide-react';
+import { UserCheck, Shield, Moon, Sun, Bell, RefreshCw, LogOut, CheckCircle2, ChevronRight, Sliders, Edit2, X, PlusCircle, BookOpen, CheckSquare, Users } from 'lucide-react';
 import { logoutUser } from '../services/authService';
+import ScheduleModal from '../components/ScheduleModal';
+import TaskModal from '../components/TaskModal';
 
-export default function ProfileSettings({ user, onLogout, theme, onToggleTheme }) {
+export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, onAddSchedule, onAddTask }) {
   const [notifications, setNotifications] = useState(true);
   const [demoResetMsg, setDemoResetMsg] = useState('');
   
-  // Profile editing state (CRUD for Profile)
   const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+
   const [displayName, setDisplayName] = useState(user?.displayName || 'Hafiz Kurniawan');
   const [prodi, setProdi] = useState(user?.prodi || 'Teknologi Informasi');
   const [semester, setSemester] = useState(user?.semester || 6);
@@ -60,6 +64,31 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme }
         </div>
       )}
 
+      {/* Central Input Management Section (Diisi di Profil) */}
+      <div className="card">
+        <div className="section-row">
+          <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+            <PlusCircle size={14} color="#22d3ee" /> Kelola Input Data
+          </span>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <button onClick={() => setIsScheduleModalOpen(true)} className="btn-ghost" style={{ justifyContent: 'space-between' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <BookOpen size={13} color="#818cf8" /> Input Jadwal Perkuliahan
+            </span>
+            <span className="badge badge-blue">+ Tambah</span>
+          </button>
+
+          <button onClick={() => setIsTaskModalOpen(true)} className="btn-ghost" style={{ justifyContent: 'space-between' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <CheckSquare size={13} color="#22d3ee" /> Input Tugas (Mandiri / Kelompok)
+            </span>
+            <span className="badge badge-cyan">+ Tambah</span>
+          </button>
+        </div>
+      </div>
+
       {/* Preferences Section */}
       <div className="card">
         <div className="section-row">
@@ -69,16 +98,14 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme }
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-          {/* Theme Toggle Item */}
           <div className="list-item" style={{ justifyContent: 'space-between', cursor: 'pointer' }} onClick={onToggleTheme}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               {theme === 'dark' ? <Moon size={14} color="#818cf8" /> : <Sun size={14} color="#fbbf24" />}
-              <span className="h4">{theme === 'dark' ? 'Mode Malam (Dark Mode)' : 'Mode Siang (Light Mode)'}</span>
+              <span className="h4">{theme === 'dark' ? 'Mode Malam (Dark)' : 'Mode Siang (Light)'}</span>
             </div>
             <span className="badge badge-blue">{theme === 'dark' ? 'Gelap' : 'Terang'}</span>
           </div>
 
-          {/* Notifications Toggle Item */}
           <div className="list-item" style={{ justifyContent: 'space-between', cursor: 'pointer' }} onClick={() => setNotifications(!notifications)}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <Bell size={14} color="#22d3ee" />
@@ -142,12 +169,16 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme }
 
               <div style={{ display: 'flex', gap: '6px', marginTop: '14px' }}>
                 <button type="button" className="btn-ghost" onClick={() => setIsEditingProfile(false)}>Batal</button>
-                <button type="submit" className="btn">Simpan Perubahan</button>
+                <button type="submit" className="btn">Simpan</button>
               </div>
             </form>
           </div>
         </div>
       )}
+
+      {/* Modals for Centralized Input */}
+      <ScheduleModal isOpen={isScheduleModalOpen} onClose={() => setIsScheduleModalOpen(false)} onAddSchedule={onAddSchedule} />
+      <TaskModal isOpen={isTaskModalOpen} onClose={() => setIsTaskModalOpen(false)} onAddTask={onAddTask} />
     </>
   );
 }

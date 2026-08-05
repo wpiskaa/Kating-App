@@ -39,10 +39,6 @@ export default function App() {
     setUser(null);
   };
 
-  if (!user) {
-    return <Login onLoginSuccess={handleLoginSuccess} />;
-  }
-
   return (
     <Router>
       <div className="viewport">
@@ -55,7 +51,19 @@ export default function App() {
               <Route path="/projects" element={<ProjectWorkspace currentUser={user} />} />
               <Route path="/wallet" element={<WalletTracker />} />
               <Route path="/achievements" element={<AchievementVault currentUser={user} />} />
-              <Route path="/profile" element={<ProfileSettings user={user} onLogout={handleLogout} theme={theme} onToggleTheme={toggleTheme} />} />
+              <Route
+                path="/profile"
+                element={
+                  <ProfileSettings
+                    user={user}
+                    onLogout={handleLogout}
+                    theme={theme}
+                    onToggleTheme={toggleTheme}
+                    onAddSchedule={(sch) => console.log('Add Schedule:', sch)}
+                    onAddTask={(task) => console.log('Add Task:', task)}
+                  />
+                }
+              />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </main>
