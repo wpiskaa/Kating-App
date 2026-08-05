@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { UserCheck, Shield, Moon, Sun, Bell, RefreshCw, LogOut, CheckCircle2, ChevronRight, Sliders, Edit2, X, PlusCircle, BookOpen, CheckSquare, Camera, Upload, Award, FileText, Sparkles, Trash2, Plus, Calendar } from 'lucide-react';
+import { UserCheck, Shield, Moon, Sun, Bell, RefreshCw, LogOut, CheckCircle2, ChevronRight, Sliders, Edit2, X, PlusCircle, BookOpen, CheckSquare, Camera, Upload, Award, FileText, Sparkles, Trash2, Plus, Calendar, ChevronUp, ChevronDown } from 'lucide-react';
 import { logoutUser } from '../services/authService';
 import { generateATSCV } from '../utils/pdfEngine';
 import ScheduleModal from '../components/ScheduleModal';
@@ -15,7 +15,15 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [isCVModalOpen, setIsCVModalOpen] = useState(false);
   const [isUploadOpen, setIsUploadOpen] = useState(false);
+  const [isFullWeeklyScheduleOpen, setIsFullWeeklyScheduleOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+
+  // Section Hide Toggles
+  const [hideCVSection, setHideCVSection] = useState(false);
+  const [hideInputSection, setHideInputSection] = useState(false);
+  const [hideSettingsSection, setHideSettingsSection] = useState(false);
+
+  const [activeDayTab, setActiveDayTab] = useState('Senin');
 
   const [displayName, setDisplayName] = useState(user?.displayName || 'Hafiz Kurniawan');
   const [prodi, setProdi] = useState(user?.prodi || 'Teknologi Informasi');
@@ -94,6 +102,8 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
     setAchievements(achievements.filter(a => a.id !== id));
   };
 
+  const daysList = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+
   return (
     <>
       {/* Profile Header Card */}
@@ -124,7 +134,7 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
             </div>
           </div>
 
-          <button onClick={() => setIsEditingProfile(true)} className="icon-btn" title="Edit Profil & Semester">
+          <button onClick={() => setIsEditingProfile(true)} className="icon-btn" title="Edit Profil & Kenaikan Semester">
             <Edit2 size={14} color="#22d3ee" />
           </button>
         </div>
@@ -142,46 +152,69 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
           <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
             <Award size={15} color="#818cf8" /> Brankas Prestasi & CV ATS
           </span>
-          <span className="badge badge-cyan">{achievements.length} Dokumen</span>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span className="badge badge-cyan">{achievements.length} Dokumen</span>
+            <button onClick={() => setHideCVSection(!hideCVSection)} className="icon-btn">
+              {hideCVSection ? <ChevronDown size={13} /> : <ChevronUp size={13} />}
+            </button>
+          </div>
         </div>
 
-        <p className="dim" style={{ marginBottom: '10px' }}>
-          Ekstrak otomatis metadata prestasi ke format PDF Resume ATS-friendly.
-        </p>
+        {!hideCVSection && (
+          <>
+            <p className="dim" style={{ marginBottom: '10px' }}>
+              Ekstrak otomatis metadata prestasi ke format PDF Resume ATS-friendly.
+            </p>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '6px' }}>
-          <button className="btn" onClick={handle1ClickCVExport} disabled={isExporting}>
-            <Sparkles size={13} /> {isExporting ? 'Proses...' : 'Ekspor CV ATS (PDF)'}
-          </button>
-          <button className="btn-ghost" onClick={() => setIsCVModalOpen(true)}>
-            <FileText size={13} /> Kelola Prestasi
-          </button>
-        </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '6px' }}>
+              <button className="btn" onClick={handle1ClickCVExport} disabled={isExporting}>
+                <Sparkles size={13} /> {isExporting ? 'Proses...' : 'Ekspor CV ATS (PDF)'}
+              </button>
+              <button className="btn-ghost" onClick={() => setIsCVModalOpen(true)}>
+                <FileText size={13} /> Kelola Prestasi
+              </button>
+            </div>
+          </>
+        )}
       </div>
 
-      {/* Central Input Management Section */}
+      {/* Central Input Management & Full Weekly Schedule Viewer Section */}
       <div className="card">
         <div className="section-row">
           <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <PlusCircle size={14} color="#22d3ee" /> Kelola Input Data (Semester {semester})
+            <PlusCircle size={14} color="#22d3ee" /> Kelola Akademik (Semester {semester})
           </span>
-        </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-          <button onClick={() => setIsScheduleModalOpen(true)} className="btn-ghost" style={{ justifyContent: 'space-between' }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <BookOpen size={13} color="#818cf8" /> Input Jadwal Perkuliahan
-            </span>
-            <span className="badge badge-blue">+ Tambah</span>
-          </button>
-
-          <button onClick={() => setIsTaskModalOpen(true)} className="btn-ghost" style={{ justifyContent: 'space-between' }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <CheckSquare size={13} color="#22d3ee" /> Input Tugas Matkul Semester Ini
-            </span>
-            <span className="badge badge-cyan">+ Tambah</span>
+          <button onClick={() => setHideInputSection(!hideInputSection)} className="icon-btn">
+            {hideInputSection ? <ChevronDown size={13} /> : <ChevronUp size={13} />}
           </button>
         </div>
+
+        {!hideInputSection && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <button onClick={() => setIsFullWeeklyScheduleOpen(true)} className="btn-ghost" style={{ justifyContent: 'space-between', borderColor: 'rgba(99,102,241,0.3)', color: '#818cf8' }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Calendar size={13} color="#818cf8" /> Lihat Lengkap Jadwal Kuliah (Senin - Sabtu)
+              </span>
+              <span className="badge badge-blue">Senin - Sabtu</span>
+            </button>
+
+            <button onClick={() => setIsScheduleModalOpen(true)} className="btn-ghost" style={{ justifyContent: 'space-between' }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <BookOpen size={13} color="#818cf8" /> Input Jadwal Perkuliahan
+              </span>
+              <span className="badge badge-blue">+ Tambah</span>
+            </button>
+
+            <button onClick={() => setIsTaskModalOpen(true)} className="btn-ghost" style={{ justifyContent: 'space-between' }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <CheckSquare size={13} color="#22d3ee" /> Input Tugas Matkul Semester Ini
+              </span>
+              <span className="badge badge-cyan">+ Tambah</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Preferences Section */}
@@ -190,27 +223,33 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
           <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
             <Sliders size={14} color="#818cf8" /> Pengaturan Sistem
           </span>
+
+          <button onClick={() => setHideSettingsSection(!hideSettingsSection)} className="icon-btn">
+            {hideSettingsSection ? <ChevronDown size={13} /> : <ChevronUp size={13} />}
+          </button>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-          <div className="list-item" style={{ justifyContent: 'space-between', cursor: 'pointer' }} onClick={onToggleTheme}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              {theme === 'dark' ? <Moon size={14} color="#818cf8" /> : <Sun size={14} color="#fbbf24" />}
-              <span className="h4">{theme === 'dark' ? 'Mode Malam (Dark)' : 'Mode Siang (Light)'}</span>
+        {!hideSettingsSection && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <div className="list-item" style={{ justifyContent: 'space-between', cursor: 'pointer' }} onClick={onToggleTheme}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                {theme === 'dark' ? <Moon size={14} color="#818cf8" /> : <Sun size={14} color="#fbbf24" />}
+                <span className="h4">{theme === 'dark' ? 'Mode Malam (Dark)' : 'Mode Siang (Light)'}</span>
+              </div>
+              <span className="badge badge-blue">{theme === 'dark' ? 'Gelap' : 'Terang'}</span>
             </div>
-            <span className="badge badge-blue">{theme === 'dark' ? 'Gelap' : 'Terang'}</span>
-          </div>
 
-          <div className="list-item" style={{ justifyContent: 'space-between', cursor: 'pointer' }} onClick={() => setNotifications(!notifications)}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Bell size={14} color="#22d3ee" />
-              <span className="h4">Notifikasi Deadline</span>
+            <div className="list-item" style={{ justifyContent: 'space-between', cursor: 'pointer' }} onClick={() => setNotifications(!notifications)}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Bell size={14} color="#22d3ee" />
+                <span className="h4">Notifikasi Deadline</span>
+              </div>
+              <span className={`badge ${notifications ? 'badge-green' : 'badge-red'}`}>
+                {notifications ? 'Aktif' : 'Mati'}
+              </span>
             </div>
-            <span className={`badge ${notifications ? 'badge-green' : 'badge-red'}`}>
-              {notifications ? 'Aktif' : 'Mati'}
-            </span>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Danger Zone */}
@@ -237,6 +276,54 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
           </button>
         </div>
       </div>
+
+      {/* FULL WEEKLY SCHEDULE VIEWER MODAL (Senin - Sabtu) */}
+      {isFullWeeklyScheduleOpen && (
+        <div className="overlay" onClick={() => setIsFullWeeklyScheduleOpen(false)}>
+          <div className="sheet" onClick={(e) => e.stopPropagation()}>
+            <div className="drag-handle" />
+            <div className="section-row">
+              <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <Calendar size={15} color="#818cf8" /> Jadwal Lengkap (Senin - Sabtu)
+              </span>
+              <button onClick={() => setIsFullWeeklyScheduleOpen(false)} className="icon-btn"><X size={16} /></button>
+            </div>
+
+            {/* Day Selector Tabs */}
+            <div style={{ display: 'flex', gap: '4px', marginBottom: '10px', overflowX: 'auto', paddingBottom: '4px' }}>
+              {daysList.map(d => (
+                <button
+                  key={d}
+                  onClick={() => setActiveDayTab(d)}
+                  className={`badge ${activeDayTab === d ? 'badge-blue' : ''}`}
+                  style={{ cursor: 'pointer', padding: '5px 8px', background: activeDayTab === d ? '' : 'rgba(255,255,255,0.03)', color: activeDayTab === d ? '' : 'var(--text-3)' }}
+                >
+                  {d}
+                </button>
+              ))}
+            </div>
+
+            {/* Schedules for Selected Day */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', margin: '8px 0' }}>
+              {availableCourses.filter(c => c.day === activeDayTab).length > 0 ? (
+                availableCourses.filter(c => c.day === activeDayTab).map(c => (
+                  <div key={c.id} className="list-item">
+                    <div style={{ flex: 1 }}>
+                      <span className="h4">{c.subject}</span>
+                      <span className="dim" style={{ display: 'block' }}>{c.time} • {c.room} ({c.lecturer})</span>
+                    </div>
+                    <span className="badge badge-cyan">{c.sks} SKS</span>
+                  </div>
+                ))
+              ) : (
+                <div className="dim" style={{ textAlign: 'center', padding: '16px' }}>Tidak ada perkuliahan pada hari {activeDayTab}.</div>
+              )}
+            </div>
+
+            <button className="btn-ghost" onClick={() => setIsFullWeeklyScheduleOpen(false)}>Tutup</button>
+          </div>
+        </div>
+      )}
 
       {/* Edit Profile Modal */}
       {isEditingProfile && (

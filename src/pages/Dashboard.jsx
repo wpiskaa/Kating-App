@@ -2,11 +2,16 @@ import React, { useState } from 'react';
 import ScheduleList from '../components/ScheduleList';
 import CountdownWidget from '../components/CountdownWidget';
 import GPACalculatorModal from '../components/GPACalculatorModal';
-import { BookOpen, Clock, TrendingUp, Sparkles, Flame, Zap, Compass, Calculator } from 'lucide-react';
+import { BookOpen, Clock, TrendingUp, Sparkles, Flame, Zap, Compass, Calculator, ChevronUp, ChevronDown } from 'lucide-react';
 
 export default function Dashboard({ user, schedules = [], tasks = [] }) {
   const [gpa, setGpa] = useState('3.88');
   const [isGPAModalOpen, setIsGPAModalOpen] = useState(false);
+
+  // Collapsible section toggles (Hide/Show)
+  const [hideStats, setHideStats] = useState(false);
+  const [hideDeadline, setHideDeadline] = useState(false);
+  const [hideTodaySchedule, setHideTodaySchedule] = useState(false);
 
   return (
     <>
@@ -38,52 +43,77 @@ export default function Dashboard({ user, schedules = [], tasks = [] }) {
         </div>
       </div>
 
-      {/* Stats Row with GPA Calculator Trigger */}
-      <div className="row">
-        <div className="stat-card" onClick={() => setIsGPAModalOpen(true)} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div className="icon-box-sm" style={{ background: 'rgba(16,185,129,0.15)', color: '#34d399' }}>
-              <TrendingUp size={14} />
+      {/* Hideable Stats Row */}
+      {!hideStats && (
+        <div className="row">
+          <div className="stat-card" onClick={() => setIsGPAModalOpen(true)} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div className="icon-box-sm" style={{ background: 'rgba(16,185,129,0.15)', color: '#34d399' }}>
+                <TrendingUp size={14} />
+              </div>
+              <div>
+                <span className="label">Target IPK</span>
+                <span className="h3 mono" style={{ display: 'block', color: '#34d399' }}>{gpa}</span>
+              </div>
             </div>
-            <div>
-              <span className="label">Target IPK</span>
-              <span className="h3 mono" style={{ display: 'block', color: '#34d399' }}>{gpa}</span>
+            <Calculator size={13} color="var(--text-3)" />
+          </div>
+
+          <div className="stat-card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div className="icon-box-sm" style={{ background: 'rgba(244,63,94,0.15)', color: '#fb7185' }}>
+                <Flame size={14} />
+              </div>
+              <div>
+                <span className="label">Deadline &lt;24j</span>
+                <span className="h3 mono" style={{ display: 'block', color: '#fb7185' }}>{tasks.length} Task</span>
+              </div>
             </div>
-          </div>
-          <Calculator size={13} color="var(--text-3)" />
-        </div>
-
-        <div className="stat-card" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <div className="icon-box-sm" style={{ background: 'rgba(244,63,94,0.15)', color: '#fb7185' }}>
-            <Flame size={14} />
-          </div>
-          <div>
-            <span className="label">Deadline &lt;24j</span>
-            <span className="h3 mono" style={{ display: 'block', color: '#fb7185' }}>{tasks.length} Task</span>
+            <button onClick={() => setHideStats(true)} className="icon-btn" title="Sembunyikan"><ChevronUp size={12} /></button>
           </div>
         </div>
-      </div>
+      )}
 
-      {/* Countdown Section */}
+      {hideStats && (
+        <button onClick={() => setHideStats(false)} className="btn-ghost" style={{ padding: '4px', fontSize: '9.5px' }}>
+          Tampilkan Target IPK & Stats <ChevronDown size={11} />
+        </button>
+      )}
+
+      {/* Deadline Tugas Section (dengan fitur Hide) */}
       <div className="card">
         <div className="section-row">
           <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <Zap size={14} color="#22d3ee" /> Countdown Tenggat
+            <Zap size={14} color="#22d3ee" /> Deadline Tugas
           </span>
-          <span className="badge badge-red">Live Ticker</span>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span className="badge badge-red">Live Ticker</span>
+            <button onClick={() => setHideDeadline(!hideDeadline)} className="icon-btn" title="Sembunyikan / Tampilkan">
+              {hideDeadline ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
+            </button>
+          </div>
         </div>
-        <CountdownWidget tasks={tasks} />
+
+        {!hideDeadline && <CountdownWidget tasks={tasks} />}
       </div>
 
-      {/* Schedule Section */}
+      {/* Jadwal Kuliah Hari Ini Section (dengan fitur Hide) */}
       <div className="card">
         <div className="section-row">
           <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <BookOpen size={14} color="#818cf8" /> Jadwal Perkuliahan
+            <BookOpen size={14} color="#818cf8" /> Jadwal Kuliah Hari Ini
           </span>
-          <span className="badge badge-blue">{schedules.length} Matkul</span>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span className="badge badge-blue">Today</span>
+            <button onClick={() => setHideTodaySchedule(!hideTodaySchedule)} className="icon-btn" title="Sembunyikan / Tampilkan">
+              {hideTodaySchedule ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
+            </button>
+          </div>
         </div>
-        <ScheduleList schedules={schedules} />
+
+        {!hideTodaySchedule && <ScheduleList schedules={schedules} />}
       </div>
 
       {/* GPA Calculator Modal */}
