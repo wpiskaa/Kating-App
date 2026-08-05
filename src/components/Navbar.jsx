@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, FolderKanban, Wallet, Award, User, Sparkles, Bell, X, AlertTriangle, Megaphone, MessageSquare } from 'lucide-react';
+import { LayoutDashboard, FolderKanban, Wallet, User, Sparkles, Bell, X, AlertTriangle, Megaphone, MessageSquare } from 'lucide-react';
 
 export default function Navbar({ user }) {
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(2);
 
+  // 5 Clean Bottom Nav items (CV ATS moved into Profile)
   const navItems = [
     { path: '/', label: 'Dasbor', icon: LayoutDashboard },
     { path: '/projects', label: 'Proyek', icon: FolderKanban },
     { path: '/wallet', label: 'Dompet', icon: Wallet },
-    { path: '/achievements', label: 'CV ATS', icon: Award },
     { path: '/chat', label: 'Chat', icon: MessageSquare },
     { path: '/profile', label: 'Profil', icon: User },
   ];
@@ -22,7 +22,7 @@ export default function Navbar({ user }) {
 
   return (
     <>
-      {/* Header */}
+      {/* Top Header */}
       <header className="header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
           <div className="icon-box-sm" style={{ background: 'var(--g-indigo-cyan)' }}>
@@ -68,7 +68,7 @@ export default function Navbar({ user }) {
         </div>
       </header>
 
-      {/* Bottom Nav */}
+      {/* Clean 5-Item Bottom Nav */}
       <nav className="bottom-nav">
         {navItems.map((item) => {
           const Icon = item.icon;
