@@ -11,6 +11,16 @@ import { getCurrentSessionUser, subscribeAuthChange, DEMO_USER } from './service
 
 export default function App() {
   const [user, setUser] = useState(() => getCurrentSessionUser() || DEMO_USER);
+  const [theme, setTheme] = useState(() => localStorage.getItem('kating_theme') || 'dark');
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('kating_theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+  };
 
   useEffect(() => {
     const unsubscribe = subscribeAuthChange((currentUser) => {
@@ -45,7 +55,7 @@ export default function App() {
               <Route path="/projects" element={<ProjectWorkspace currentUser={user} />} />
               <Route path="/wallet" element={<WalletTracker />} />
               <Route path="/achievements" element={<AchievementVault currentUser={user} />} />
-              <Route path="/profile" element={<ProfileSettings user={user} onLogout={handleLogout} />} />
+              <Route path="/profile" element={<ProfileSettings user={user} onLogout={handleLogout} theme={theme} onToggleTheme={toggleTheme} />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </main>
