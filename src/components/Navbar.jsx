@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
-import { Home, FolderKanban, Wallet, MessageSquare, User, Bell, CheckCircle2, QrCode, Settings } from 'lucide-react';
+import { NavLink } from 'react-router-dom';
+import { Home, FolderKanban, Wallet, MessageSquare, User, Bell, CheckCircle2, QrCode } from 'lucide-react';
 import QRCodeModal from './QRCodeModal';
 
 export default function Navbar({ user }) {
-  const navigate = useNavigate();
   const [isNotifDrawerOpen, setIsNotifDrawerOpen] = useState(false);
   const [isQRModalOpen, setIsQRModalOpen] = useState(false);
 
@@ -35,10 +34,6 @@ export default function Navbar({ user }) {
               position: 'absolute', top: 2, right: 2, width: '6px', height: '6px',
               borderRadius: '50%', background: '#f43f5e'
             }} />
-          </button>
-
-          <button onClick={() => navigate('/settings')} className="icon-btn" title="Pengaturan Sistem Aplikasi">
-            <Settings size={17} color="var(--text-2)" />
           </button>
         </div>
       </header>

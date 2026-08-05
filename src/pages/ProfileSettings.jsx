@@ -103,7 +103,7 @@ export default function ProfileSettings({ user, onAddSchedule, onAddTask, availa
     setAchToDelete(null);
   };
 
-  const daysList = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+  const daysList = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
 
   return (
     <>
@@ -141,19 +141,35 @@ export default function ProfileSettings({ user, onAddSchedule, onAddTask, availa
         </div>
       </div>
 
-      {/* Link to App Settings Page */}
-      <div className="card" onClick={() => navigate('/settings')} style={{ cursor: 'pointer', background: 'linear-gradient(135deg, rgba(34,211,238,0.08) 0%, var(--bg-card) 100%)', border: '1px solid rgba(34,211,238,0.2)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div className="icon-box-sm" style={{ background: 'rgba(34,211,238,0.15)', color: '#22d3ee' }}>
-              <Settings size={16} />
-            </div>
-            <div>
-              <span className="h3">Pengaturan Sistem Aplikasi</span>
-              <span className="dim" style={{ display: 'block' }}>Tema, Notifikasi, Log Aktivitas, Sesi & Reset</span>
-            </div>
-          </div>
-          <ChevronRight size={16} color="var(--text-3)" />
+      {/* Central Input Management Section */}
+      <div className="card">
+        <div className="section-row">
+          <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+            <PlusCircle size={14} color="#22d3ee" /> Kelola Akademik (Semester {semester})
+          </span>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <button onClick={() => setIsFullWeeklyScheduleOpen(true)} className="btn-ghost" style={{ justifyContent: 'space-between', borderColor: 'rgba(99,102,241,0.3)', color: '#818cf8' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Calendar size={13} color="#818cf8" /> Jadwal Lengkap Kuliah
+            </span>
+            <span className="badge badge-blue">Lengkap</span>
+          </button>
+
+          <button onClick={() => setIsScheduleModalOpen(true)} className="btn-ghost" style={{ justifyContent: 'space-between' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <BookOpen size={13} color="#818cf8" /> Input Jadwal Perkuliahan
+            </span>
+            <span className="badge badge-blue">+ Tambah</span>
+          </button>
+
+          <button onClick={() => setIsTaskModalOpen(true)} className="btn-ghost" style={{ justifyContent: 'space-between' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <CheckSquare size={13} color="#22d3ee" /> Input Tugas Matkul Semester Ini
+            </span>
+            <span className="badge badge-cyan">+ Tambah</span>
+          </button>
         </div>
       </div>
 
@@ -180,35 +196,19 @@ export default function ProfileSettings({ user, onAddSchedule, onAddTask, availa
         </div>
       </div>
 
-      {/* Central Input Management Section */}
-      <div className="card">
-        <div className="section-row">
-          <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <PlusCircle size={14} color="#22d3ee" /> Kelola Akademik (Semester {semester})
-          </span>
-        </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-          <button onClick={() => setIsFullWeeklyScheduleOpen(true)} className="btn-ghost" style={{ justifyContent: 'space-between', borderColor: 'rgba(99,102,241,0.3)', color: '#818cf8' }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Calendar size={13} color="#818cf8" /> Lihat Lengkap Jadwal Kuliah (Senin - Sabtu)
-            </span>
-            <span className="badge badge-blue">Senin - Sabtu</span>
-          </button>
-
-          <button onClick={() => setIsScheduleModalOpen(true)} className="btn-ghost" style={{ justifyContent: 'space-between' }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <BookOpen size={13} color="#818cf8" /> Input Jadwal Perkuliahan
-            </span>
-            <span className="badge badge-blue">+ Tambah</span>
-          </button>
-
-          <button onClick={() => setIsTaskModalOpen(true)} className="btn-ghost" style={{ justifyContent: 'space-between' }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <CheckSquare size={13} color="#22d3ee" /> Input Tugas Matkul Semester Ini
-            </span>
-            <span className="badge badge-cyan">+ Tambah</span>
-          </button>
+      {/* Settings Link Card (MOVED TO THE BOTTOM) */}
+      <div className="card" onClick={() => navigate('/settings')} style={{ cursor: 'pointer', background: 'linear-gradient(135deg, rgba(34,211,238,0.08) 0%, var(--bg-card) 100%)', border: '1px solid rgba(34,211,238,0.2)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div className="icon-box-sm" style={{ background: 'rgba(34,211,238,0.15)', color: '#22d3ee' }}>
+              <Settings size={16} />
+            </div>
+            <div>
+              <span className="h3">Pengaturan Sistem Aplikasi</span>
+              <span className="dim" style={{ display: 'block' }}>Tema, Notifikasi, Log Aktivitas, Sesi & Reset</span>
+            </div>
+          </div>
+          <ChevronRight size={16} color="var(--text-3)" />
         </div>
       </div>
 
@@ -228,7 +228,7 @@ export default function ProfileSettings({ user, onAddSchedule, onAddTask, availa
             <div className="drag-handle" />
             <div className="section-row">
               <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                <Calendar size={15} color="#818cf8" /> Jadwal Lengkap (Senin - Sabtu)
+                <Calendar size={15} color="#818cf8" /> Jadwal Lengkap Kuliah
               </span>
               <button onClick={() => setIsFullWeeklyScheduleOpen(false)} className="icon-btn"><X size={16} /></button>
             </div>
