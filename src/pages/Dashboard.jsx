@@ -1,96 +1,138 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import ScheduleList from '../components/ScheduleList';
 import CountdownWidget from '../components/CountdownWidget';
-import { BookOpen, Clock, TrendingUp, Sparkles, Flame, CheckCircle2, Zap } from 'lucide-react';
+import ScheduleModal from '../components/ScheduleModal';
+import TaskModal from '../components/TaskModal';
+import { BookOpen, Clock, TrendingUp, Sparkles, Flame, Plus, ChevronUp, ChevronDown, Trash2 } from 'lucide-react';
 
 export default function Dashboard({ user }) {
-  const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+  // Collapsible section states (Hide/Show feature)
+  const [hideStats, setHideStats] = useState(false);
+  const [hideCountdown, setHideCountdown] = useState(false);
+  const [hideSchedule, setHideSchedule] = useState(false);
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
+  // Modals state
+  const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
 
-  const [schedules] = useState([
+  // Schedules state (CRUD)
+  const [schedules, setSchedules] = useState([
     { id: 1, subject: "PBO", time: "08:00 - 10:30", room: "Lab 3", lecturer: "Dr. Bambang", sks: 3, status: "Completed" },
     { id: 2, subject: "PAB", time: "10:45 - 13:15", room: "R.402", lecturer: "Ahmad Wijaya", sks: 3, status: "Ongoing" },
     { id: 3, subject: "Keamanan Jaringan", time: "14:00 - 16:30", room: "R.301", lecturer: "Siti Rahma", sks: 2, status: "Upcoming" }
   ]);
 
-  const [tasks] = useState([
+  // Tasks state (CRUD)
+  const [tasks, setTasks] = useState([
     { id: 101, title: "Riset PAB Multi-Spectral", subject: "PAB", code: "PAB2026", category: "Kelompok", deadline: new Date(Date.now() + 14 * 3600 * 1000).toISOString() },
     { id: 102, title: "Tugas Mandiri Diagram UML", subject: "PBO", code: "PBO2026", category: "Individu", deadline: new Date(Date.now() + 48 * 3600 * 1000).toISOString() }
   ]);
 
+  const handleAddSchedule = (newSch) => {
+    setSchedules([...schedules, newSch]);
+  };
+
+  const handleAddTask = (newTask) => {
+    setTasks([...tasks, newTask]);
+  };
+
+  const handleDeleteSchedule = (id) => {
+    setSchedules(schedules.filter(s => s.id !== id));
+  };
+
   return (
-    <div className="anim-fade">
-      {/* Animated Greeting Banner */}
-      <div className="card-hero" style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%)', border: '1px solid rgba(99,102,241,0.3)', padding: '14px 16px' }}>
+    <>
+      {/* Greeting Banner */}
+      <div className="card-hero" style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%)', border: '1px solid rgba(99,102,241,0.3)', padding: '12px 14px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '2px' }}>
-              <span className="live-dot" />
-              <span className="label" style={{ color: '#818cf8' }}>Akademik Real-Time</span>
+            <span className="label" style={{ color: '#818cf8' }}>Akademik Dasbor</span>
+            <h2 className="h2" style={{ fontSize: '15px', marginTop: '2px' }}>Hai, {user?.displayName?.split(' ')[0] || 'Hafiz'} 👋</h2>
+            <span className="muted">{user?.prodi || 'Teknologi Informasi'} • Sem {user?.semester || 6}</span>
+          </div>
+
+          <div style={{ display: 'flex', gap: '4px' }}>
+            <button onClick={() => setIsTaskModalOpen(true)} className="badge badge-cyan" style={{ cursor: 'pointer' }}>+ Tugas</button>
+            <button onClick={() => setIsScheduleModalOpen(true)} className="badge badge-blue" style={{ cursor: 'pointer' }}>+ Jadwal</button>
+          </div>
+        </div>
+      </div>
+
+      {/* Hideable Stats Row */}
+      {!hideStats && (
+        <div className="row">
+          <div className="stat-card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <TrendingUp size={14} color="#34d399" />
+              <div>
+                <span className="label">Target IPK</span>
+                <span className="h3 mono" style={{ display: 'block', color: '#34d399' }}>3.88</span>
+              </div>
             </div>
-            <h2 className="h2" style={{ fontSize: '16px' }}>Halo, {user?.displayName?.split(' ')[0] || 'Hafiz'} ✨</h2>
-            <span className="muted">{user?.prodi || 'Teknologi Informasi'} • Semester {user?.semester || 6}</span>
+            <button onClick={() => setHideStats(true)} className="icon-btn" title="Sembunyikan"><ChevronUp size={12} /></button>
           </div>
 
-          <div style={{ textAlign: 'right' }}>
-            <span className="mono h3" style={{ color: '#22d3ee', display: 'block' }}>{currentTime}</span>
-            <span className="dim" style={{ fontSize: '9px' }}>Waktu Indonesia</span>
+          <div className="stat-card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Flame size={14} color="#fb7185" />
+              <div>
+                <span className="label">Urgent</span>
+                <span className="h3 mono" style={{ display: 'block', color: '#fb7185' }}>1 Task</span>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
-      {/* 2 Animated Stat Widgets */}
-      <div className="row">
-        <div className="stat-card" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div className="icon-box-sm" style={{ background: 'rgba(16,185,129,0.15)', color: '#34d399' }}>
-            <TrendingUp size={14} />
-          </div>
-          <div>
-            <span className="label">IPK Target</span>
-            <span className="h2 mono" style={{ display: 'block', color: '#34d399', fontSize: '15px' }}>3.88</span>
-          </div>
-        </div>
+      {hideStats && (
+        <button onClick={() => setHideStats(false)} className="btn-ghost" style={{ padding: '4px', fontSize: '9.5px' }}>
+          Show Ringkasan Stats <ChevronDown size={11} />
+        </button>
+      )}
 
-        <div className="stat-card" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div className="icon-box-sm" style={{ background: 'rgba(244,63,94,0.15)', color: '#fb7185' }}>
-            <Flame size={14} />
-          </div>
-          <div>
-            <span className="label">Urgent &lt;24j</span>
-            <span className="h2 mono" style={{ display: 'block', color: '#fb7185', fontSize: '15px' }}>1 Task</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Live Countdown Section */}
+      {/* Countdown Section with Hide/Show */}
       <div className="card">
         <div className="section-row">
-          <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <Zap size={14} color="#22d3ee" /> Countdown Tenggat
+          <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+            <Clock size={14} color="#22d3ee" /> Countdown Tenggat
           </span>
-          <span className="badge badge-red" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <span className="live-dot-urgent" /> Live Ticker
-          </span>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <button onClick={() => setIsTaskModalOpen(true)} className="badge badge-cyan" style={{ cursor: 'pointer' }}>+ Tambah</button>
+            <button onClick={() => setHideCountdown(!hideCountdown)} className="icon-btn">
+              {hideCountdown ? <ChevronDown size={13} /> : <ChevronUp size={13} />}
+            </button>
+          </div>
         </div>
-        <CountdownWidget tasks={tasks} />
+
+        {!hideCountdown && <CountdownWidget tasks={tasks} />}
       </div>
 
-      {/* Schedule Section */}
+      {/* Schedule Section with Hide/Show & Delete */}
       <div className="card">
         <div className="section-row">
-          <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
             <BookOpen size={14} color="#818cf8" /> Jadwal Perkuliahan
           </span>
-          <span className="badge badge-blue">3 Matkul Hari Ini</span>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <button onClick={() => setIsScheduleModalOpen(true)} className="badge badge-blue" style={{ cursor: 'pointer' }}>+ Tambah</button>
+            <button onClick={() => setHideSchedule(!hideSchedule)} className="icon-btn">
+              {hideSchedule ? <ChevronDown size={13} /> : <ChevronUp size={13} />}
+            </button>
+          </div>
         </div>
-        <ScheduleList schedules={schedules} />
+
+        {!hideSchedule && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <ScheduleList schedules={schedules} />
+          </div>
+        )}
       </div>
-    </div>
+
+      {/* Modals */}
+      <ScheduleModal isOpen={isScheduleModalOpen} onClose={() => setIsScheduleModalOpen(false)} onAddSchedule={handleAddSchedule} />
+      <TaskModal isOpen={isTaskModalOpen} onClose={() => setIsTaskModalOpen(false)} onAddTask={handleAddTask} />
+    </>
   );
 }

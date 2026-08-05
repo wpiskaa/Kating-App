@@ -1,39 +1,41 @@
 import React, { useState } from 'react';
 import MemberProgressBar from '../components/MemberProgressBar';
-import { FolderKanban, CheckSquare, ShieldAlert, UserPlus, Plus, Trash2, X, Edit3 } from 'lucide-react';
+import TaskModal from '../components/TaskModal';
+import { FolderKanban, CheckSquare, ShieldAlert, UserPlus, Plus, Trash2, X, Filter, ChevronUp, ChevronDown, User } from 'lucide-react';
 
 export default function ProjectWorkspace({ currentUser }) {
   const [projectDeadline] = useState(new Date(Date.now() + 18 * 3600 * 1000).toISOString());
+  const [filterType, setFilterType] = useState('Semua'); // 'Semua' | 'Mandiri' | 'Kelompok'
 
-  // Members list (CRUD - Create/Read/Delete)
+  const [hideTeamMembers, setHideTeamMembers] = useState(false);
+  const [hideTasksList, setHideTasksList] = useState(false);
+
+  // Members list (Team Invite CRUD)
   const [members, setMembers] = useState([
     { id: "mem-1", name: "Hafiz Kurniawan", role: "Frontend Lead", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80", totalSubtasks: 3, completedSubtasks: 2 },
     { id: "mem-2", name: "Ilham", role: "Backend Architect", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=250&q=80", totalSubtasks: 3, completedSubtasks: 3 },
     { id: "mem-3", name: "Rian Prasetya", role: "Database Analyst", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=250&q=80", totalSubtasks: 2, completedSubtasks: 0 }
   ]);
 
-  // Subtasks list (CRUD - Create/Read/Update/Delete)
+  // Tasks & Subtasks (Mandiri + Kelompok CRUD)
   const [subtasks, setSubtasks] = useState([
-    { id: 'st-1', title: 'UI Shell & Dynamic Countdown', assignedTo: 'mem-1', completed: true },
-    { id: 'st-2', title: 'Google Auth Firebase Client', assignedTo: 'mem-1', completed: true },
-    { id: 'st-3', title: '1-Click ATS Resume Generator', assignedTo: 'mem-1', completed: false },
-    { id: 'st-4', title: 'Firestore NoSQL Database', assignedTo: 'mem-2', completed: true },
-    { id: 'st-5', title: 'firestore.rules Security', assignedTo: 'mem-2', completed: true },
-    { id: 'st-6', title: 'Cloud Functions Flagging', assignedTo: 'mem-2', completed: true },
-    { id: 'st-7', title: 'Normalisasi Relasi Koleksi', assignedTo: 'mem-3', completed: false },
-    { id: 'st-8', title: 'Kamus Data & Indexing', assignedTo: 'mem-3', completed: false }
+    { id: 'st-1', title: 'UI Shell & Dynamic Countdown', assignedTo: 'mem-1', category: 'Kelompok', completed: true },
+    { id: 'st-2', title: 'Google Auth Firebase Client', assignedTo: 'mem-1', category: 'Kelompok', completed: true },
+    { id: 'st-3', title: '1-Click ATS Resume Generator', assignedTo: 'mem-1', category: 'Mandiri', completed: false },
+    { id: 'st-4', title: 'Firestore NoSQL Database', assignedTo: 'mem-2', category: 'Kelompok', completed: true },
+    { id: 'st-5', title: 'firestore.rules Security', assignedTo: 'mem-2', category: 'Kelompok', completed: true },
+    { id: 'st-6', title: 'Cloud Functions Flagging', assignedTo: 'mem-2', category: 'Kelompok', completed: true },
+    { id: 'st-7', title: 'Normalisasi Relasi Koleksi', assignedTo: 'mem-3', category: 'Mandiri', completed: false },
+    { id: 'st-8', title: 'Kamus Data & Indexing', assignedTo: 'mem-3', category: 'Kelompok', completed: false }
   ]);
 
   // Modals state
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRole, setInviteRole] = useState('Anggota Tim');
 
-  const [isAddSubtaskOpen, setIsAddSubtaskOpen] = useState(false);
-  const [newTaskTitle, setNewTaskTitle] = useState('');
-  const [newTaskAssignee, setNewTaskAssignee] = useState('mem-1');
-
-  // CRUD Actions
   const handleInviteMember = (e) => {
     e.preventDefault();
     if (!inviteEmail) return;
@@ -53,24 +55,17 @@ export default function ProjectWorkspace({ currentUser }) {
     setIsInviteModalOpen(false);
   };
 
-  const handleAddSubtask = (e) => {
-    e.preventDefault();
-    if (!newTaskTitle) return;
-
-    const newTask = {
+  const handleAddTask = (newTask) => {
+    const newSubtask = {
       id: `st-${Date.now()}`,
-      title: newTaskTitle,
-      assignedTo: newTaskAssignee,
+      title: newTask.title,
+      assignedTo: 'mem-1',
+      category: newTask.category,
       completed: false
     };
 
-    setSubtasks([...subtasks, newTask]);
-    
-    // Update member total count
-    setMembers(members.map(m => m.id === newTaskAssignee ? { ...m, totalSubtasks: m.totalSubtasks + 1 } : m));
-
-    setNewTaskTitle('');
-    setIsAddSubtaskOpen(false);
+    setSubtasks([...subtasks, newSubtask]);
+    setMembers(members.map(m => m.id === 'mem-1' ? { ...m, totalSubtasks: m.totalSubtasks + 1 } : m));
   };
 
   const handleToggleSubtask = (subtaskId, assignedMemberId) => {
@@ -113,105 +108,160 @@ export default function ProjectWorkspace({ currentUser }) {
     }
   };
 
+  // Filter tasks based on filterType
+  const filteredSubtasks = subtasks.filter(t => {
+    if (filterType === 'Mandiri') return t.category === 'Mandiri';
+    if (filterType === 'Kelompok') return t.category === 'Kelompok';
+    return true;
+  });
+
   return (
     <>
-      {/* Header Alert */}
+      {/* Header Alert Card */}
       <div className="card-hero" style={{ background: 'linear-gradient(135deg, rgba(244,63,94,0.12) 0%, var(--bg-card) 100%)', border: '1px solid rgba(244,63,94,0.3)' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <ShieldAlert size={16} color="#f43f5e" />
             <div>
-              <h2 className="h3">Drama-Free Project Manager</h2>
-              <span className="dim" style={{ color: '#fb7185' }}>Tenggat Akhir Proyek: 18 Jam Lagi</span>
+              <h2 className="h3">Tugas & Proyek (Mandiri & Kelompok)</h2>
+              <span className="dim" style={{ color: '#fb7185' }}>Batas Kritis: 18 Jam Lagi</span>
             </div>
           </div>
 
-          <button onClick={() => setIsInviteModalOpen(true)} className="btn" style={{ padding: '6px 10px', fontSize: '10px', width: 'auto' }}>
+          <button onClick={() => setIsInviteModalOpen(true)} className="btn" style={{ padding: '5px 8px', fontSize: '9.5px', width: 'auto' }}>
             <UserPlus size={12} /> Invite Teman
           </button>
         </div>
       </div>
 
-      {/* Member Progress Bars */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-        {members.map((member) => (
-          <MemberProgressBar
-            key={member.id}
-            member={member}
-            projectDeadline={projectDeadline}
-          />
-        ))}
-      </div>
+      {/* Hideable Team Members Progress */}
+      {!hideTeamMembers && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <div className="section-row" style={{ marginBottom: '2px' }}>
+            <span className="h4" style={{ color: 'var(--text-2)' }}>Progres Tim Kelompok</span>
+            <button onClick={() => setHideTeamMembers(true)} className="icon-btn" title="Sembunyikan"><ChevronUp size={12} /></button>
+          </div>
+          {members.map((member) => (
+            <MemberProgressBar
+              key={member.id}
+              member={member}
+              projectDeadline={projectDeadline}
+            />
+          ))}
+        </div>
+      )}
 
-      {/* Subtasks Workspace */}
+      {hideTeamMembers && (
+        <button onClick={() => setHideTeamMembers(false)} className="btn-ghost" style={{ padding: '4px', fontSize: '9.5px' }}>
+          Show Progres Tim Kelompok <ChevronDown size={11} />
+        </button>
+      )}
+
+      {/* Task Filter & List Card */}
       <div className="card">
         <div className="section-row">
           <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <FolderKanban size={15} color="#22d3ee" /> Sub-Tugas Tim
+            <FolderKanban size={15} color="#22d3ee" /> Daftar Tugas & Sub-Tugas
           </span>
-          
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span className="badge badge-cyan">
-              {subtasks.filter(t => t.completed).length}/{subtasks.length}
-            </span>
-            <button onClick={() => setIsAddSubtaskOpen(true)} className="badge badge-blue" style={{ cursor: 'pointer' }}>
-              + Tambah Task
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <button onClick={() => setIsTaskModalOpen(true)} className="badge badge-cyan" style={{ cursor: 'pointer' }}>+ Task</button>
+            <button onClick={() => setHideTasksList(!hideTasksList)} className="icon-btn">
+              {hideTasksList ? <ChevronDown size={13} /> : <ChevronUp size={13} />}
             </button>
           </div>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-          {subtasks.map((task) => {
-            const assignedMember = members.find(m => m.id === task.assignedTo);
-            return (
-              <div
-                key={task.id}
-                onClick={() => handleToggleSubtask(task.id, task.assignedTo)}
-                className="list-item"
-                style={{ cursor: 'pointer', opacity: task.completed ? 0.7 : 1 }}
+        {/* Filter Mandiri / Kelompok Switcher */}
+        {!hideTasksList && (
+          <>
+            <div style={{ display: 'flex', gap: '4px', marginBottom: '8px' }}>
+              <button
+                onClick={() => setFilterType('Semua')}
+                className={`badge ${filterType === 'Semua' ? 'badge-blue' : ''}`}
+                style={{ cursor: 'pointer', background: filterType === 'Semua' ? '' : 'rgba(255,255,255,0.03)', color: filterType === 'Semua' ? '' : 'var(--text-3)' }}
               >
-                <div style={{
-                  width: '16px', height: '16px', borderRadius: '4px',
-                  background: task.completed ? 'var(--emerald)' : 'transparent',
-                  border: task.completed ? 'none' : '1.5px solid var(--text-3)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', flexShrink: 0
-                }}>
-                  {task.completed && <CheckSquare size={11} />}
-                </div>
+                Semua ({subtasks.length})
+              </button>
+              <button
+                onClick={() => setFilterType('Mandiri')}
+                className={`badge ${filterType === 'Mandiri' ? 'badge-yellow' : ''}`}
+                style={{ cursor: 'pointer', background: filterType === 'Mandiri' ? '' : 'rgba(255,255,255,0.03)', color: filterType === 'Mandiri' ? '' : 'var(--text-3)' }}
+              >
+                Mandiri ({subtasks.filter(t => t.category === 'Mandiri').length})
+              </button>
+              <button
+                onClick={() => setFilterType('Kelompok')}
+                className={`badge ${filterType === 'Kelompok' ? 'badge-cyan' : ''}`}
+                style={{ cursor: 'pointer', background: filterType === 'Kelompok' ? '' : 'rgba(255,255,255,0.03)', color: filterType === 'Kelompok' ? '' : 'var(--text-3)' }}
+              >
+                Kelompok ({subtasks.filter(t => t.category === 'Kelompok').length})
+              </button>
+            </div>
 
-                <span className="h4" style={{ flex: 1, textDecoration: task.completed ? 'line-through' : 'none' }}>
-                  {task.title}
-                </span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+              {filteredSubtasks.map((task) => {
+                const assignedMember = members.find(m => m.id === task.assignedTo);
+                return (
+                  <div
+                    key={task.id}
+                    onClick={() => handleToggleSubtask(task.id, task.assignedTo)}
+                    className="list-item"
+                    style={{ cursor: 'pointer', opacity: task.completed ? 0.7 : 1 }}
+                  >
+                    <div style={{
+                      width: '16px', height: '16px', borderRadius: '4px',
+                      background: task.completed ? 'var(--emerald)' : 'transparent',
+                      border: task.completed ? 'none' : '1.5px solid var(--text-3)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', flexShrink: 0
+                    }}>
+                      {task.completed && <CheckSquare size={11} />}
+                    </div>
 
-                <img
-                  src={assignedMember?.avatar}
-                  alt={assignedMember?.name}
-                  style={{ width: '18px', height: '18px', borderRadius: '50%', objectFit: 'cover' }}
-                  title={assignedMember?.name}
-                />
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <span className="h4" style={{ textDecoration: task.completed ? 'line-through' : 'none' }}>
+                          {task.title}
+                        </span>
+                        <span className={`badge ${task.category === 'Kelompok' ? 'badge-cyan' : 'badge-yellow'}`}>
+                          {task.category}
+                        </span>
+                      </div>
+                    </div>
 
-                <button onClick={(e) => handleDeleteSubtask(task.id, task.assignedTo, e)} className="icon-btn">
-                  <Trash2 size={12} color="#fb7185" />
-                </button>
-              </div>
-            );
-          })}
-        </div>
+                    {task.category === 'Kelompok' && (
+                      <img
+                        src={assignedMember?.avatar}
+                        alt={assignedMember?.name}
+                        style={{ width: '18px', height: '18px', borderRadius: '50%', objectFit: 'cover' }}
+                        title={assignedMember?.name}
+                      />
+                    )}
+
+                    <button onClick={(e) => handleDeleteSubtask(task.id, task.assignedTo, e)} className="icon-btn">
+                      <Trash2 size={12} color="#fb7185" />
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        )}
       </div>
 
-      {/* Invite Member Modal */}
+      {/* Invite Modal */}
       {isInviteModalOpen && (
         <div className="overlay" onClick={() => setIsInviteModalOpen(false)}>
           <div className="sheet" onClick={(e) => e.stopPropagation()}>
             <div className="drag-handle" />
             <div className="section-row">
-              <span className="h3">Invite Teman / Anggota Kelompok</span>
+              <span className="h3">Invite Teman Kelompok</span>
               <button onClick={() => setIsInviteModalOpen(false)} className="icon-btn"><X size={16} /></button>
             </div>
 
             <form onSubmit={handleInviteMember}>
               <div className="field">
-                <label className="field-label">Email / ID Anggota</label>
+                <label className="field-label">Email / ID Teman</label>
                 <input
                   type="text"
                   className="field-input"
@@ -223,11 +273,11 @@ export default function ProjectWorkspace({ currentUser }) {
               </div>
 
               <div className="field">
-                <label className="field-label">Peran dalam Tim</label>
+                <label className="field-label">Peran Tim</label>
                 <input
                   type="text"
                   className="field-input"
-                  placeholder="Contoh: UI Designer / QA Engineer"
+                  placeholder="UI Designer / Backend Developer"
                   value={inviteRole}
                   onChange={(e) => setInviteRole(e.target.value)}
                   required
@@ -243,50 +293,8 @@ export default function ProjectWorkspace({ currentUser }) {
         </div>
       )}
 
-      {/* Add Subtask Modal */}
-      {isAddSubtaskOpen && (
-        <div className="overlay" onClick={() => setIsAddSubtaskOpen(false)}>
-          <div className="sheet" onClick={(e) => e.stopPropagation()}>
-            <div className="drag-handle" />
-            <div className="section-row">
-              <span className="h3">Tambah Sub-Tugas Kelompok</span>
-              <button onClick={() => setIsAddSubtaskOpen(false)} className="icon-btn"><X size={16} /></button>
-            </div>
-
-            <form onSubmit={handleAddSubtask}>
-              <div className="field">
-                <label className="field-label">Judul Sub-Tugas</label>
-                <input
-                  type="text"
-                  className="field-input"
-                  placeholder="Contoh: Pengujian Unit Test Auth API"
-                  value={newTaskTitle}
-                  onChange={(e) => setNewTaskTitle(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="field">
-                <label className="field-label">Delegasi Kepada Anggota</label>
-                <select
-                  className="field-select"
-                  value={newTaskAssignee}
-                  onChange={(e) => setNewTaskAssignee(e.target.value)}
-                >
-                  {members.map(m => (
-                    <option key={m.id} value={m.id}>{m.name} ({m.role})</option>
-                  ))}
-                </select>
-              </div>
-
-              <div style={{ display: 'flex', gap: '6px', marginTop: '14px' }}>
-                <button type="button" className="btn-ghost" onClick={() => setIsAddSubtaskOpen(false)}>Batal</button>
-                <button type="submit" className="btn">Tambah Sub-Tugas</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      {/* Task Modal */}
+      <TaskModal isOpen={isTaskModalOpen} onClose={() => setIsTaskModalOpen(false)} onAddTask={handleAddTask} />
     </>
   );
 }
