@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { UserCheck, Shield, Moon, Sun, Bell, RefreshCw, LogOut, CheckCircle2, ChevronRight, Sliders, Edit2, X, PlusCircle, BookOpen, CheckSquare, Users } from 'lucide-react';
+import { UserCheck, Shield, Moon, Sun, Bell, RefreshCw, LogOut, CheckCircle2, ChevronRight, Sliders, Edit2, X, PlusCircle, BookOpen, CheckSquare, Camera, Upload } from 'lucide-react';
 import { logoutUser } from '../services/authService';
 import ScheduleModal from '../components/ScheduleModal';
 import TaskModal from '../components/TaskModal';
@@ -15,6 +15,7 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
   const [displayName, setDisplayName] = useState(user?.displayName || 'Hafiz Kurniawan');
   const [prodi, setProdi] = useState(user?.prodi || 'Teknologi Informasi');
   const [semester, setSemester] = useState(user?.semester || 6);
+  const [photoURL, setPhotoURL] = useState(user?.photoURL || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80');
 
   const handleResetData = () => {
     localStorage.clear();
@@ -24,9 +25,20 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
     }, 800);
   };
 
+  const handlePhotoUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPhotoURL(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSaveProfile = (e) => {
     e.preventDefault();
-    const updatedUser = { ...user, displayName, prodi, semester: parseInt(semester) };
+    const updatedUser = { ...user, displayName, prodi, semester: parseInt(semester), photoURL };
     localStorage.setItem('kating_user', JSON.stringify(updatedUser));
     setIsEditingProfile(false);
     window.location.reload();
@@ -38,11 +50,21 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
       <div className="card" style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(34,211,238,0.08) 100%)' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <img
-              src={user?.photoURL}
-              alt={user?.displayName}
-              style={{ width: '42px', height: '42px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--indigo)' }}
-            />
+            <div style={{ position: 'relative' }}>
+              <img
+                src={photoURL}
+                alt={displayName}
+                style={{ width: '44px', height: '44px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--indigo)' }}
+              />
+              <label htmlFor="profile-photo-input" style={{
+                position: 'absolute', bottom: -2, right: -2, background: 'var(--indigo)', color: 'white',
+                borderRadius: '50%', padding: '3px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center'
+              }}>
+                <Camera size={10} />
+              </label>
+              <input type="file" id="profile-photo-input" accept="image/*" style={{ display: 'none' }} onChange={handlePhotoUpload} />
+            </div>
+
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                 <span className="h3">{displayName}</span>
@@ -64,7 +86,7 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
         </div>
       )}
 
-      {/* Central Input Management Section (Diisi di Profil) */}
+      {/* Central Input Management Section */}
       <div className="card">
         <div className="section-row">
           <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
@@ -149,11 +171,21 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
           <div className="sheet" onClick={(e) => e.stopPropagation()}>
             <div className="drag-handle" />
             <div className="section-row">
-              <span className="h3">Edit Profil Mahasiswa</span>
+              <span className="h3">Edit Profil & Upload Foto</span>
               <button onClick={() => setIsEditingProfile(false)} className="icon-btn"><X size={16} /></button>
             </div>
 
             <form onSubmit={handleSaveProfile}>
+              <div style={{ textAlign: 'center', marginBottom: '12px' }}>
+                <img src={photoURL} alt="Avatar" style={{ width: '56px', height: '56px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--indigo)', marginBottom: '6px' }} />
+                <div>
+                  <label htmlFor="photo-file-upload" className="badge badge-cyan" style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    <Upload size={10} /> Unggah Foto Baru
+                  </label>
+                  <input type="file" id="photo-file-upload" accept="image/*" style={{ display: 'none' }} onChange={handlePhotoUpload} />
+                </div>
+              </div>
+
               <div className="field">
                 <label className="field-label">Nama Lengkap</label>
                 <input type="text" className="field-input" value={displayName} onChange={(e) => setDisplayName(e.target.value)} required />

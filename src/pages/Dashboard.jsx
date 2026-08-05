@@ -1,49 +1,25 @@
 import React, { useState } from 'react';
 import ScheduleList from '../components/ScheduleList';
 import CountdownWidget from '../components/CountdownWidget';
-import ScheduleModal from '../components/ScheduleModal';
-import TaskModal from '../components/TaskModal';
-import { BookOpen, Clock, TrendingUp, Sparkles, Flame, Plus, ChevronUp, ChevronDown, Trash2 } from 'lucide-react';
+import { BookOpen, Clock, TrendingUp, Sparkles, Flame, Megaphone, Zap } from 'lucide-react';
 
 export default function Dashboard({ user }) {
-  // Collapsible section states (Hide/Show feature)
-  const [hideStats, setHideStats] = useState(false);
-  const [hideCountdown, setHideCountdown] = useState(false);
-  const [hideSchedule, setHideSchedule] = useState(false);
-
-  // Modals state
-  const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
-  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
-
-  // Schedules state (CRUD)
-  const [schedules, setSchedules] = useState([
+  // Pure Read-Only Overview Data (Zero Input Forms on Dashboard)
+  const [schedules] = useState([
     { id: 1, subject: "PBO", time: "08:00 - 10:30", room: "Lab 3", lecturer: "Dr. Bambang", sks: 3, status: "Completed" },
     { id: 2, subject: "PAB", time: "10:45 - 13:15", room: "R.402", lecturer: "Ahmad Wijaya", sks: 3, status: "Ongoing" },
     { id: 3, subject: "Keamanan Jaringan", time: "14:00 - 16:30", room: "R.301", lecturer: "Siti Rahma", sks: 2, status: "Upcoming" }
   ]);
 
-  // Tasks state (CRUD)
-  const [tasks, setTasks] = useState([
+  const [tasks] = useState([
     { id: 101, title: "Riset PAB Multi-Spectral", subject: "PAB", code: "PAB2026", category: "Kelompok", deadline: new Date(Date.now() + 14 * 3600 * 1000).toISOString() },
     { id: 102, title: "Tugas Mandiri Diagram UML", subject: "PBO", code: "PBO2026", category: "Individu", deadline: new Date(Date.now() + 48 * 3600 * 1000).toISOString() }
   ]);
 
-  const handleAddSchedule = (newSch) => {
-    setSchedules([...schedules, newSch]);
-  };
-
-  const handleAddTask = (newTask) => {
-    setTasks([...tasks, newTask]);
-  };
-
-  const handleDeleteSchedule = (id) => {
-    setSchedules(schedules.filter(s => s.id !== id));
-  };
-
   return (
     <>
       {/* Greeting Banner */}
-      <div className="card-hero" style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%)', border: '1px solid rgba(99,102,241,0.3)', padding: '12px 14px' }}>
+      <div className="card-hero" style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%)', border: '1px solid rgba(99,102,241,0.3)', padding: '14px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
             <span className="label" style={{ color: '#818cf8' }}>Akademik Dasbor</span>
@@ -51,88 +27,69 @@ export default function Dashboard({ user }) {
             <span className="muted">{user?.prodi || 'Teknologi Informasi'} • Sem {user?.semester || 6}</span>
           </div>
 
-          <div style={{ display: 'flex', gap: '4px' }}>
-            <button onClick={() => setIsTaskModalOpen(true)} className="badge badge-cyan" style={{ cursor: 'pointer' }}>+ Tugas</button>
-            <button onClick={() => setIsScheduleModalOpen(true)} className="badge badge-blue" style={{ cursor: 'pointer' }}>+ Jadwal</button>
+          <div className="icon-box-sm" style={{ background: 'rgba(99,102,241,0.2)' }}>
+            <Sparkles size={16} color="#818cf8" />
           </div>
         </div>
       </div>
 
-      {/* Hideable Stats Row */}
-      {!hideStats && (
-        <div className="row">
-          <div className="stat-card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <TrendingUp size={14} color="#34d399" />
-              <div>
-                <span className="label">Target IPK</span>
-                <span className="h3 mono" style={{ display: 'block', color: '#34d399' }}>3.88</span>
-              </div>
-            </div>
-            <button onClick={() => setHideStats(true)} className="icon-btn" title="Sembunyikan"><ChevronUp size={12} /></button>
+      {/* Announcement Card Banner */}
+      <div className="card" style={{ background: 'linear-gradient(135deg, rgba(34,211,238,0.1) 0%, var(--bg-card) 100%)', border: '1px solid rgba(34,211,238,0.25)', padding: '10px 12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div className="icon-box-sm" style={{ background: 'rgba(34,211,238,0.15)', color: '#22d3ee' }}>
+            <Megaphone size={14} />
           </div>
-
-          <div className="stat-card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Flame size={14} color="#fb7185" />
-              <div>
-                <span className="label">Urgent</span>
-                <span className="h3 mono" style={{ display: 'block', color: '#fb7185' }}>1 Task</span>
-              </div>
-            </div>
+          <div>
+            <span className="h4" style={{ color: '#22d3ee' }}>Pengumuman Akademik:</span>
+            <span className="dim" style={{ display: 'block' }}>KRS Semester 7 dibuka 10 Agustus 2026.</span>
           </div>
         </div>
-      )}
+      </div>
 
-      {hideStats && (
-        <button onClick={() => setHideStats(false)} className="btn-ghost" style={{ padding: '4px', fontSize: '9.5px' }}>
-          Show Ringkasan Stats <ChevronDown size={11} />
-        </button>
-      )}
+      {/* Stats Row */}
+      <div className="row">
+        <div className="stat-card" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div className="icon-box-sm" style={{ background: 'rgba(16,185,129,0.15)', color: '#34d399' }}>
+            <TrendingUp size={14} />
+          </div>
+          <div>
+            <span className="label">Target IPK</span>
+            <span className="h3 mono" style={{ display: 'block', color: '#34d399' }}>3.88</span>
+          </div>
+        </div>
 
-      {/* Countdown Section with Hide/Show */}
+        <div className="stat-card" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div className="icon-box-sm" style={{ background: 'rgba(244,63,94,0.15)', color: '#fb7185' }}>
+            <Flame size={14} />
+          </div>
+          <div>
+            <span className="label">Deadline &lt;24j</span>
+            <span className="h3 mono" style={{ display: 'block', color: '#fb7185' }}>1 Task</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Countdown Section */}
       <div className="card">
         <div className="section-row">
           <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <Clock size={14} color="#22d3ee" /> Countdown Tenggat
+            <Zap size={14} color="#22d3ee" /> Countdown Deadline
           </span>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <button onClick={() => setIsTaskModalOpen(true)} className="badge badge-cyan" style={{ cursor: 'pointer' }}>+ Tambah</button>
-            <button onClick={() => setHideCountdown(!hideCountdown)} className="icon-btn">
-              {hideCountdown ? <ChevronDown size={13} /> : <ChevronUp size={13} />}
-            </button>
-          </div>
+          <span className="badge badge-red">Live Ticker</span>
         </div>
-
-        {!hideCountdown && <CountdownWidget tasks={tasks} />}
+        <CountdownWidget tasks={tasks} />
       </div>
 
-      {/* Schedule Section with Hide/Show & Delete */}
+      {/* Schedule Section */}
       <div className="card">
         <div className="section-row">
           <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <BookOpen size={14} color="#818cf8" /> Jadwal Perkuliahan
+            <BookOpen size={14} color="#818cf8" /> Jadwal Perkuliahan Hari Ini
           </span>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <button onClick={() => setIsScheduleModalOpen(true)} className="badge badge-blue" style={{ cursor: 'pointer' }}>+ Tambah</button>
-            <button onClick={() => setHideSchedule(!hideSchedule)} className="icon-btn">
-              {hideSchedule ? <ChevronDown size={13} /> : <ChevronUp size={13} />}
-            </button>
-          </div>
+          <span className="badge badge-blue">3 Matkul</span>
         </div>
-
-        {!hideSchedule && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <ScheduleList schedules={schedules} />
-          </div>
-        )}
+        <ScheduleList schedules={schedules} />
       </div>
-
-      {/* Modals */}
-      <ScheduleModal isOpen={isScheduleModalOpen} onClose={() => setIsScheduleModalOpen(false)} onAddSchedule={handleAddSchedule} />
-      <TaskModal isOpen={isTaskModalOpen} onClose={() => setIsTaskModalOpen(false)} onAddTask={handleAddTask} />
     </>
   );
 }

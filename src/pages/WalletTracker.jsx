@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
 import ExpenseModal from '../components/ExpenseModal';
 import { calculateSafeDailyBudget, getDaysRemainingInMonth, checkOverBudget, formatIDR } from '../utils/financialCalculations';
-import { Wallet, AlertCircle, Plus, ArrowDownRight, ShoppingBag, Trash2, Edit2, X, CreditCard, ShieldCheck } from 'lucide-react';
+import { Wallet, AlertCircle, Plus, ArrowDownRight, ShoppingBag, Trash2, Edit2, X, CreditCard, Clock, Filter } from 'lucide-react';
 
 export default function WalletTracker() {
   const [totalAllowance, setTotalAllowance] = useState(1500000);
   const [currentBalance, setCurrentBalance] = useState(980000);
+  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('Semua');
+
   const [expenses, setExpenses] = useState([
     { id: 'exp-1', title: 'Makan Rutin Warmindo', amount: 18000, category: 'Makan & Minum', location: 'Warmindo War-Kun', date: new Date().toISOString() },
-    { id: 'exp-2', title: 'Kopi & Wifi Tugas', amount: 25000, category: 'Hiburan / Kopi', location: 'Kopi Jahat Tamantirto', date: new Date().toISOString() }
+    { id: 'exp-2', title: 'Kopi & Wifi Tugas', amount: 25000, category: 'Hiburan / Kopi', location: 'Kopi Jahat Tamantirto', date: new Date().toISOString() },
+    { id: 'exp-3', title: 'Cetak Berkas Tugas Lab', amount: 12000, category: 'Akademik', location: 'Fotocopy Kampus UMY', date: new Date(Date.now() - 86400000).toISOString() }
   ]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -45,14 +48,20 @@ export default function WalletTracker() {
     setIsEditBudgetOpen(false);
   };
 
+  // Filtered Expenses
+  const filteredExpenses = expenses.filter(e => {
+    if (selectedCategoryFilter === 'Semua') return true;
+    return e.category === selectedCategoryFilter;
+  });
+
   return (
-    <div className="anim-fade">
-      {/* Sleek Credit Card Style Wallet Banner */}
+    <>
+      {/* Sleek Credit Card Banner */}
       <div className={`wallet-card-hero ${isOverSafeLimit ? 'wallet-alert' : ''}`}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <CreditCard size={18} color="white" />
-            <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', opacity: 0.9 }}>
+            <span style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', opacity: 0.9 }}>
               Batas Aman Belanja (FR-3.3)
             </span>
           </div>
@@ -62,37 +71,37 @@ export default function WalletTracker() {
           </span>
         </div>
 
-        <h2 className="mono" style={{ fontSize: '24px', fontWeight: 800, lineHeight: 1, marginBottom: '6px' }}>
-          {formatIDR(safeDailyBudget)} <span style={{ fontSize: '12px', opacity: 0.8, fontWeight: 500 }}>/ Hari</span>
+        <h2 className="mono" style={{ fontSize: '22px', fontWeight: 800, lineHeight: 1, marginBottom: '6px' }}>
+          {formatIDR(safeDailyBudget)} <span style={{ fontSize: '11px', opacity: 0.8, fontWeight: 500 }}>/ Hari</span>
         </h2>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '12px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '10px' }}>
           <div>
-            <span style={{ fontSize: '10px', opacity: 0.8, display: 'block' }}>Saldo Uang Saku</span>
-            <span className="mono" style={{ fontSize: '13px', fontWeight: 700 }}>{formatIDR(currentBalance)}</span>
+            <span style={{ fontSize: '9px', opacity: 0.8, display: 'block' }}>Saldo Uang Saku</span>
+            <span className="mono" style={{ fontSize: '12px', fontWeight: 700 }}>{formatIDR(currentBalance)}</span>
           </div>
 
           <div style={{ textAlign: 'right' }}>
-            <span style={{ fontSize: '10px', opacity: 0.8, display: 'block' }}>Sisa Kalender</span>
-            <span className="mono" style={{ fontSize: '12px', fontWeight: 700 }}>{daysRemaining} Hari</span>
+            <span style={{ fontSize: '9px', opacity: 0.8, display: 'block' }}>Sisa Kalender</span>
+            <span className="mono" style={{ fontSize: '11px', fontWeight: 700 }}>{daysRemaining} Hari</span>
           </div>
         </div>
 
         {isOverSafeLimit && (
-          <div style={{ marginTop: '10px', padding: '6px 8px', background: 'rgba(0,0,0,0.3)', borderRadius: '8px', fontSize: '10px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <AlertCircle size={12} color="#f43f5e" /> Pengeluaran hari ini ({formatIDR(todayExpensesSum)}) melebihi limit harian!
+          <div style={{ marginTop: '8px', padding: '5px 8px', background: 'rgba(0,0,0,0.3)', borderRadius: '8px', fontSize: '9.5px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <AlertCircle size={12} color="#f43f5e" /> Pengeluaran hari ini ({formatIDR(todayExpensesSum)}) melebihi limit!
           </div>
         )}
       </div>
 
-      {/* Action Button & Stats */}
+      {/* Action Button & Stats Row */}
       <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '8px' }}>
         <button className="btn" onClick={() => setIsModalOpen(true)} style={{ height: '100%' }}>
-          <Plus size={14} /> Catat Pengeluaran
+          <Plus size={14} /> Catat Transaksi
         </button>
 
         <div className="stat-card" style={{ position: 'relative' }}>
-          <span className="label">Uang Saku (Edit)</span>
+          <span className="label">Uang Saku</span>
           <span className="h3 mono" style={{ color: '#818cf8', display: 'block', marginTop: '2px' }}>{formatIDR(totalAllowance)}</span>
           <button onClick={() => setIsEditBudgetOpen(true)} className="icon-btn" style={{ position: 'absolute', top: '4px', right: '4px' }}>
             <Edit2 size={11} color="#818cf8" />
@@ -100,26 +109,45 @@ export default function WalletTracker() {
         </div>
       </div>
 
-      {/* Expense List */}
+      {/* Dedicated Riwayat Transaksi Section */}
       <div className="card">
         <div className="section-row">
           <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <ShoppingBag size={14} color="#818cf8" /> Arus Kas Keluar Harian
+            <Clock size={15} color="#818cf8" /> Riwayat Transaksi Arus Kas
           </span>
-          <span className="badge badge-blue">{expenses.length} Transaksi</span>
+          <span className="badge badge-blue">{filteredExpenses.length} Berkas</span>
+        </div>
+
+        {/* Category Filter Chips */}
+        <div style={{ display: 'flex', gap: '4px', marginBottom: '8px', flexWrap: 'wrap' }}>
+          {['Semua', 'Makan & Minum', 'Hiburan / Kopi', 'Akademik'].map(cat => (
+            <button
+              key={cat}
+              onClick={() => setSelectedCategoryFilter(cat)}
+              className={`badge ${selectedCategoryFilter === cat ? 'badge-cyan' : ''}`}
+              style={{ cursor: 'pointer', background: selectedCategoryFilter === cat ? '' : 'rgba(255,255,255,0.03)', color: selectedCategoryFilter === cat ? '' : 'var(--text-3)' }}
+            >
+              {cat}
+            </button>
+          ))}
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-          {expenses.map((item) => (
+          {filteredExpenses.map((item) => (
             <div key={item.id} className="list-item">
               <div className="icon-box-sm" style={{ background: 'rgba(244,63,94,0.12)', color: '#fb7185' }}>
                 <ArrowDownRight size={14} />
               </div>
               <div style={{ flex: 1 }}>
-                <span className="h4">{item.title}</span>
-                <span className="dim" style={{ display: 'block' }}>{item.location}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <span className="h4">{item.title}</span>
+                  <span className="badge badge-yellow">{item.category}</span>
+                </div>
+                <span className="dim" style={{ display: 'block' }}>{item.location} • {new Date(item.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}</span>
               </div>
+
               <span className="mono h4" style={{ color: '#fb7185' }}>-{formatIDR(item.amount)}</span>
+
               <button onClick={() => handleDeleteExpense(item.id, item.amount)} className="icon-btn" title="Hapus Transaksi">
                 <Trash2 size={12} color="#fb7185" />
               </button>
@@ -164,6 +192,6 @@ export default function WalletTracker() {
         onClose={() => setIsModalOpen(false)}
         onAddExpense={handleAddExpense}
       />
-    </div>
+    </>
   );
 }
