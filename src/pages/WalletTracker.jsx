@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import ExpenseModal from '../components/ExpenseModal';
 import { calculateSafeDailyBudget, getDaysRemainingInMonth, checkOverBudget, formatIDR } from '../utils/financialCalculations';
-import { Wallet, AlertCircle, Plus, ArrowDownRight, ShoppingBag, Trash2, Edit2, X, CreditCard, Clock, Filter } from 'lucide-react';
+import { Wallet, AlertCircle, Plus, ArrowDownRight, ShoppingBag, Trash2, Edit2, X, CreditCard, Clock } from 'lucide-react';
 
 export default function WalletTracker() {
   const [totalAllowance, setTotalAllowance] = useState(1500000);
@@ -28,6 +28,10 @@ export default function WalletTracker() {
 
   const isOverSafeLimit = checkOverBudget(todayExpensesSum, safeDailyBudget);
 
+  // Extract unique categories dynamically from recorded expenses
+  const existingCategories = Array.from(new Set(expenses.map(e => e.category)));
+  const allCategoryFilters = ['Semua', ...existingCategories];
+
   const handleAddExpense = (newExpense) => {
     setExpenses([newExpense, ...expenses]);
     setCurrentBalance((prev) => Math.max(0, prev - newExpense.amount));
@@ -48,7 +52,6 @@ export default function WalletTracker() {
     setIsEditBudgetOpen(false);
   };
 
-  // Filtered Expenses
   const filteredExpenses = expenses.filter(e => {
     if (selectedCategoryFilter === 'Semua') return true;
     return e.category === selectedCategoryFilter;
@@ -56,7 +59,7 @@ export default function WalletTracker() {
 
   return (
     <>
-      {/* Sleek Credit Card Banner */}
+      {/* Credit Card Banner */}
       <div className={`wallet-card-hero ${isOverSafeLimit ? 'wallet-alert' : ''}`}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -109,7 +112,7 @@ export default function WalletTracker() {
         </div>
       </div>
 
-      {/* Dedicated Riwayat Transaksi Section */}
+      {/* Riwayat Transaksi Section */}
       <div className="card">
         <div className="section-row">
           <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
@@ -118,9 +121,9 @@ export default function WalletTracker() {
           <span className="badge badge-blue">{filteredExpenses.length} Berkas</span>
         </div>
 
-        {/* Category Filter Chips */}
+        {/* Dynamic Category Filter Chips */}
         <div style={{ display: 'flex', gap: '4px', marginBottom: '8px', flexWrap: 'wrap' }}>
-          {['Semua', 'Makan & Minum', 'Hiburan / Kopi', 'Akademik'].map(cat => (
+          {allCategoryFilters.map(cat => (
             <button
               key={cat}
               onClick={() => setSelectedCategoryFilter(cat)}
@@ -191,6 +194,7 @@ export default function WalletTracker() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onAddExpense={handleAddExpense}
+        categories={existingCategories}
       />
     </>
   );
