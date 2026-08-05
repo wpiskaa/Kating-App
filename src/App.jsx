@@ -10,7 +10,7 @@ import AchievementVault from './pages/AchievementVault';
 import ChatWorkspace from './pages/ChatWorkspace';
 import ProfileSettings from './pages/ProfileSettings';
 import AppSettings from './pages/AppSettings';
-import { getCurrentSessionUser, subscribeAuthChange, DEMO_USER } from './services/authService';
+import { getCurrentSessionUser, subscribeAuthChange, logoutUser } from './services/authService';
 
 const DEFAULT_SEMESTER_DATASETS = {
   6: {
@@ -28,7 +28,7 @@ const DEFAULT_SEMESTER_DATASETS = {
 };
 
 export default function App() {
-  const [user, setUser] = useState(() => getCurrentSessionUser() || DEMO_USER);
+  const [user, setUser] = useState(() => getCurrentSessionUser());
   const [theme, setTheme] = useState(() => localStorage.getItem('kating_theme') || 'dark');
   const [toast, setToast] = useState(null);
 
@@ -82,21 +82,23 @@ export default function App() {
 
   useEffect(() => {
     const unsubscribe = subscribeAuthChange((currentUser) => {
-      if (currentUser) {
-        setUser(currentUser);
-      }
+      setUser(currentUser);
     });
     return () => unsubscribe();
   }, []);
 
   const handleLoginSuccess = (loggedInUser) => {
     setUser(loggedInUser);
+    localStorage.setItem('kating_user', JSON.stringify(loggedInUser));
     showToast(`Selamat datang kembali, ${loggedInUser.displayName}!`);
     logActivity('Login Berhasil', `Masuk ke akun ${loggedInUser.displayName}`);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await logoutUser();
     setUser(null);
+    localStorage.removeItem('kating_user');
+    showToast('Sesi akun berhasil keluar');
   };
 
   const activeSchedules = allSemesterSchedules[activeSemester]?.schedules || [];
@@ -138,45 +140,54 @@ export default function App() {
     <Router>
       <div className="viewport">
         <div className="shell">
-          <Navbar user={user} />
           <Toast toast={toast} onClose={() => setToast(null)} />
           
-          <main className="page">
-            <Routes>
-              <Route path="/" element={<Dashboard user={user} schedules={activeSchedules} tasks={activeTasks} />} />
-              <Route path="/projects" element={<ProjectWorkspace currentUser={user} availableCourses={activeSchedules} semesterTasks={activeTasks} onActionNotice={showToast} onLogAction={logActivity} />} />
-              <Route path="/wallet" element={<WalletTracker onActionNotice={showToast} onLogAction={logActivity} />} />
-              <Route path="/achievements" element={<AchievementVault currentUser={user} onActionNotice={showToast} onLogAction={logActivity} />} />
-              <Route path="/chat" element={<ChatWorkspace currentUser={user} onActionNotice={showToast} onLogAction={logActivity} />} />
-              <Route
-                path="/profile"
-                element={
-                  <ProfileSettings
-                    user={user}
-                    onAddSchedule={handleAddSchedule}
-                    onAddTask={handleAddTask}
-                    availableCourses={activeSchedules}
-                    onActionNotice={showToast}
-                    onLogAction={logActivity}
+          {!user ? (
+            <main className="page" style={{ paddingTop: '20px' }}>
+              <Login onLoginSuccess={handleLoginSuccess} />
+            </main>
+          ) : (
+            <>
+              <Navbar user={user} />
+              
+              <main className="page">
+                <Routes>
+                  <Route path="/" element={<Dashboard user={user} schedules={activeSchedules} tasks={activeTasks} />} />
+                  <Route path="/projects" element={<ProjectWorkspace currentUser={user} availableCourses={activeSchedules} semesterTasks={activeTasks} onActionNotice={showToast} onLogAction={logActivity} />} />
+                  <Route path="/wallet" element={<WalletTracker onActionNotice={showToast} onLogAction={logActivity} />} />
+                  <Route path="/achievements" element={<AchievementVault currentUser={user} onActionNotice={showToast} onLogAction={logActivity} />} />
+                  <Route path="/chat" element={<ChatWorkspace currentUser={user} onActionNotice={showToast} onLogAction={logActivity} />} />
+                  <Route
+                    path="/profile"
+                    element={
+                      <ProfileSettings
+                        user={user}
+                        onAddSchedule={handleAddSchedule}
+                        onAddTask={handleAddTask}
+                        availableCourses={activeSchedules}
+                        onActionNotice={showToast}
+                        onLogAction={logActivity}
+                      />
+                    }
                   />
-                }
-              />
-              <Route
-                path="/settings"
-                element={
-                  <AppSettings
-                    theme={theme}
-                    onToggleTheme={toggleTheme}
-                    activityLogs={activityLogs}
-                    onLogout={handleLogout}
-                    onActionNotice={showToast}
-                    onLogAction={logActivity}
+                  <Route
+                    path="/settings"
+                    element={
+                      <AppSettings
+                        theme={theme}
+                        onToggleTheme={toggleTheme}
+                        activityLogs={activityLogs}
+                        onLogout={handleLogout}
+                        onActionNotice={showToast}
+                        onLogAction={logActivity}
+                      />
+                    }
                   />
-                }
-              />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </main>
+                  <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
+              </main>
+            </>
+          )}
         </div>
       </div>
     </Router>
