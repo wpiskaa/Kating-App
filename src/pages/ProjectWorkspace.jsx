@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import MemberProgressBar from '../components/MemberProgressBar';
+import TaskModal from '../components/TaskModal';
 import { FolderKanban, CheckSquare, ShieldAlert, UserPlus, Plus, Trash2, X, Users, ArrowLeft, User, PlusCircle } from 'lucide-react';
 
-export default function ProjectWorkspace({ currentUser }) {
-  const [activeTab, setActiveTab] = useState('Kelompok'); // 'Mandiri' | 'Kelompok'
+export default function ProjectWorkspace({ currentUser, availableCourses = [], onActionNotice, onLogAction }) {
+  const [activeTab, setActiveTab] = useState('Kelompok');
+  const [projectDeadline] = useState(new Date(Date.now() + 18 * 3600 * 1000).toISOString());
 
-  // Personal Mandiri Tasks (CRUD)
+  // Personal Mandiri Tasks
   const [personalTasks, setPersonalTasks] = useState([
     { id: 'p-1', title: 'Tugas Mandiri Diagram UML PBO', subject: 'PBO', completed: false, deadline: '24 Jam lagi' },
     { id: 'p-2', title: 'Analisis Vektor Serangan MitM', subject: 'Keamanan Jaringan', completed: true, deadline: 'Selesai' }
@@ -13,7 +15,7 @@ export default function ProjectWorkspace({ currentUser }) {
   const [newPersonalTitle, setNewPersonalTitle] = useState('');
   const [isAddPersonalOpen, setIsAddPersonalOpen] = useState(false);
 
-  // Multi-Group List (CRUD - Create/Read/Delete)
+  // Multi-Group List
   const [groups, setGroups] = useState([
     {
       id: 'grp-1',
@@ -35,26 +37,10 @@ export default function ProjectWorkspace({ currentUser }) {
         { id: 'st-7', title: 'Normalisasi Relasi Koleksi', assignedTo: 'mem-3', completed: false },
         { id: 'st-8', title: 'Kamus Data & Indexing', assignedTo: 'mem-3', completed: false }
       ]
-    },
-    {
-      id: 'grp-2',
-      name: 'Riset Multi-Spectral Sensing',
-      subject: 'Inovasi Perangkat',
-      deadline: new Date(Date.now() + 96 * 3600 * 1000).toISOString(),
-      members: [
-        { id: "mem-1", name: "Hafiz Kurniawan", role: "Ketua Peneliti", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80", totalSubtasks: 2, completedSubtasks: 1 }
-      ],
-      subtasks: [
-        { id: 'st-9', title: 'Pemindaian Optic Blood Sensing', assignedTo: 'mem-1', completed: true },
-        { id: 'st-10', title: 'Uji Akurasi Sample Darah', assignedTo: 'mem-1', completed: false }
-      ]
     }
   ]);
 
-  // Selected Group Detail Room View
   const [selectedGroup, setSelectedGroup] = useState(null);
-
-  // Modals inside Group
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRole, setInviteRole] = useState('Anggota Tim');
@@ -67,24 +53,35 @@ export default function ProjectWorkspace({ currentUser }) {
   const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
   const [newSubtaskAssignee, setNewSubtaskAssignee] = useState('mem-1');
 
-  // Handle Create Personal Task
+  // Actions with Toast Notification & Activity Log
   const handleAddPersonalTask = (e) => {
     e.preventDefault();
     if (!newPersonalTitle) return;
-    setPersonalTasks([...personalTasks, { id: `p-${Date.now()}`, title: newPersonalTitle, subject: 'Mandiri', completed: false, deadline: '24 Jam' }]);
+    const newTask = { id: `p-${Date.now()}`, title: newPersonalTitle, subject: 'Mandiri', completed: false, deadline: '24 Jam' };
+    setPersonalTasks([...personalTasks, newTask]);
     setNewPersonalTitle('');
     setIsAddPersonalOpen(false);
+
+    if (onActionNotice) onActionNotice(`Tugas Mandiri "${newPersonalTitle}" disimpan!`);
+    if (onLogAction) onLogAction('Tambah Tugas Mandiri', newPersonalTitle);
   };
 
   const handleTogglePersonalTask = (id) => {
+    const taskObj = personalTasks.find(t => t.id === id);
     setPersonalTasks(personalTasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
+
+    if (onActionNotice) onActionNotice(`Status tugas "${taskObj?.title || ''}" diperbarui!`);
+    if (onLogAction) onLogAction('Ubah Status Tugas', taskObj?.title || id);
   };
 
   const handleDeletePersonalTask = (id) => {
+    const taskObj = personalTasks.find(t => t.id === id);
     setPersonalTasks(personalTasks.filter(t => t.id !== id));
+
+    if (onActionNotice) onActionNotice(`Tugas "${taskObj?.title || ''}" dihapus`, 'delete');
+    if (onLogAction) onLogAction('Hapus Tugas Mandiri', taskObj?.title || id);
   };
 
-  // Handle Create Group
   const handleCreateGroup = (e) => {
     e.preventDefault();
     if (!newGroupName) return;
@@ -104,9 +101,11 @@ export default function ProjectWorkspace({ currentUser }) {
     setNewGroupName('');
     setNewGroupSubject('');
     setIsAddGroupOpen(false);
+
+    if (onActionNotice) onActionNotice(`Kelompok "${newGroupName}" berhasil dibuat!`);
+    if (onLogAction) onLogAction('Buat Kelompok Baru', newGroupName);
   };
 
-  // Handle Invite Member to Selected Group
   const handleInviteMember = (e) => {
     e.preventDefault();
     if (!inviteEmail || !selectedGroup) return;
@@ -130,9 +129,11 @@ export default function ProjectWorkspace({ currentUser }) {
     setGroups(groups.map(g => g.id === selectedGroup.id ? updatedGroup : g));
     setInviteEmail('');
     setIsInviteModalOpen(false);
+
+    if (onActionNotice) onActionNotice(`Undangan dikirim ke ${inviteEmail}!`);
+    if (onLogAction) onLogAction('Invite Teman', `${inviteEmail} ke ${selectedGroup.name}`);
   };
 
-  // Handle Add Subtask to Selected Group
   const handleAddGroupSubtask = (e) => {
     e.preventDefault();
     if (!newSubtaskTitle || !selectedGroup) return;
@@ -146,38 +147,15 @@ export default function ProjectWorkspace({ currentUser }) {
 
     const updatedSubtasks = [...selectedGroup.subtasks, newSt];
     const updatedMembers = selectedGroup.members.map(m => m.id === newSubtaskAssignee ? { ...m, totalSubtasks: m.totalSubtasks + 1 } : m);
-
     const updatedGroup = { ...selectedGroup, subtasks: updatedSubtasks, members: updatedMembers };
 
     setSelectedGroup(updatedGroup);
     setGroups(groups.map(g => g.id === selectedGroup.id ? updatedGroup : g));
     setNewSubtaskTitle('');
     setIsAddGroupSubtaskOpen(false);
-  };
 
-  const handleToggleSubtaskInGroup = (subtaskId, assignedMemberId) => {
-    if (!selectedGroup) return;
-    let isNowCompleted = false;
-
-    const updatedSubtasks = selectedGroup.subtasks.map(t => {
-      if (t.id === subtaskId) {
-        isNowCompleted = !t.completed;
-        return { ...t, completed: isNowCompleted };
-      }
-      return t;
-    });
-
-    const updatedMembers = selectedGroup.members.map(m => {
-      if (m.id === assignedMemberId) {
-        const diff = isNowCompleted ? 1 : -1;
-        return { ...m, completedSubtasks: Math.max(0, m.completedSubtasks + diff) };
-      }
-      return m;
-    });
-
-    const updatedGroup = { ...selectedGroup, subtasks: updatedSubtasks, members: updatedMembers };
-    setSelectedGroup(updatedGroup);
-    setGroups(groups.map(g => g.id === selectedGroup.id ? updatedGroup : g));
+    if (onActionNotice) onActionNotice(`Sub-tugas "${newSubtaskTitle}" ditambahkan!`);
+    if (onLogAction) onLogAction('Tambah Sub-Tugas', `${newSubtaskTitle} [${selectedGroup.name}]`);
   };
 
   return (
@@ -277,7 +255,6 @@ export default function ProjectWorkspace({ currentUser }) {
             <ArrowLeft size={12} /> Kembali ke Daftar Kelompok
           </button>
 
-          {/* Group Header Alert */}
           <div className="card-hero" style={{ background: 'linear-gradient(135deg, rgba(244,63,94,0.12) 0%, var(--bg-card) 100%)', border: '1px solid rgba(244,63,94,0.3)' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
@@ -291,7 +268,6 @@ export default function ProjectWorkspace({ currentUser }) {
             </div>
           </div>
 
-          {/* Group Members List */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
             {selectedGroup.members.map((member) => (
               <MemberProgressBar
@@ -302,7 +278,6 @@ export default function ProjectWorkspace({ currentUser }) {
             ))}
           </div>
 
-          {/* Subtasks inside this Group */}
           <div className="card">
             <div className="section-row">
               <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
@@ -317,9 +292,8 @@ export default function ProjectWorkspace({ currentUser }) {
                 return (
                   <div
                     key={task.id}
-                    onClick={() => handleToggleSubtaskInGroup(task.id, task.assignedTo)}
                     className="list-item"
-                    style={{ cursor: 'pointer', opacity: task.completed ? 0.7 : 1 }}
+                    style={{ opacity: task.completed ? 0.7 : 1 }}
                   >
                     <div style={{
                       width: '16px', height: '16px', borderRadius: '4px',
@@ -348,7 +322,7 @@ export default function ProjectWorkspace({ currentUser }) {
         </>
       )}
 
-      {/* Modal Add Personal Task */}
+      {/* Modals */}
       {isAddPersonalOpen && (
         <div className="overlay" onClick={() => setIsAddPersonalOpen(false)}>
           <div className="sheet" onClick={(e) => e.stopPropagation()}>
@@ -372,7 +346,6 @@ export default function ProjectWorkspace({ currentUser }) {
         </div>
       )}
 
-      {/* Modal Create New Group */}
       {isAddGroupOpen && (
         <div className="overlay" onClick={() => setIsAddGroupOpen(false)}>
           <div className="sheet" onClick={(e) => e.stopPropagation()}>
@@ -400,7 +373,6 @@ export default function ProjectWorkspace({ currentUser }) {
         </div>
       )}
 
-      {/* Modal Invite Member into Selected Group */}
       {isInviteModalOpen && selectedGroup && (
         <div className="overlay" onClick={() => setIsInviteModalOpen(false)}>
           <div className="sheet" onClick={(e) => e.stopPropagation()}>
@@ -428,7 +400,6 @@ export default function ProjectWorkspace({ currentUser }) {
         </div>
       )}
 
-      {/* Modal Add Subtask into Selected Group */}
       {isAddGroupSubtaskOpen && selectedGroup && (
         <div className="overlay" onClick={() => setIsAddGroupSubtaskOpen(false)}>
           <div className="sheet" onClick={(e) => e.stopPropagation()}>

@@ -3,7 +3,7 @@ import ExpenseModal from '../components/ExpenseModal';
 import { calculateSafeDailyBudget, getDaysRemainingInMonth, checkOverBudget, formatIDR } from '../utils/financialCalculations';
 import { Wallet, AlertCircle, Plus, ArrowDownRight, ShoppingBag, Trash2, Edit2, X, CreditCard, Clock, ChevronUp, ChevronDown } from 'lucide-react';
 
-export default function WalletTracker() {
+export default function WalletTracker({ onActionNotice, onLogAction }) {
   const [totalAllowance, setTotalAllowance] = useState(1500000);
   const [currentBalance, setCurrentBalance] = useState(980000);
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('Semua');
@@ -40,11 +40,18 @@ export default function WalletTracker() {
   const handleAddExpense = (newExpense) => {
     setExpenses([newExpense, ...expenses]);
     setCurrentBalance((prev) => Math.max(0, prev - newExpense.amount));
+
+    if (onActionNotice) onActionNotice(`Pengeluaran ${newExpense.title} (${formatIDR(newExpense.amount)}) dicatat!`);
+    if (onLogAction) onLogAction('Catat Transaksi', `${newExpense.title} [${formatIDR(newExpense.amount)}]`);
   };
 
   const handleDeleteExpense = (id, amount) => {
+    const itemObj = expenses.find(e => e.id === id);
     setExpenses(expenses.filter(e => e.id !== id));
     setCurrentBalance((prev) => prev + amount);
+
+    if (onActionNotice) onActionNotice(`Transaksi "${itemObj?.title || ''}" dihapus`, 'delete');
+    if (onLogAction) onLogAction('Hapus Transaksi', itemObj?.title || id);
   };
 
   const handleSaveBudget = (e) => {
@@ -53,6 +60,8 @@ export default function WalletTracker() {
     if (!isNaN(val)) {
       setTotalAllowance(val);
       setCurrentBalance(val);
+      if (onActionNotice) onActionNotice(`Uang saku bulanan diubah ke ${formatIDR(val)}`);
+      if (onLogAction) onLogAction('Ubah Uang Saku', formatIDR(val));
     }
     setIsEditBudgetOpen(false);
   };
@@ -64,7 +73,7 @@ export default function WalletTracker() {
 
   return (
     <>
-      {/* Credit Card Banner (dengan fitur Hide) */}
+      {/* Credit Card Banner */}
       {!hideCardHero && (
         <div className={`wallet-card-hero ${isOverSafeLimit ? 'wallet-alert' : ''}`}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
@@ -128,7 +137,7 @@ export default function WalletTracker() {
         </div>
       </div>
 
-      {/* Riwayat Transaksi Section (dengan fitur Hide) */}
+      {/* Riwayat Transaksi Section */}
       <div className="card">
         <div className="section-row">
           <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>

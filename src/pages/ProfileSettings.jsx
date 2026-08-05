@@ -6,7 +6,7 @@ import ScheduleModal from '../components/ScheduleModal';
 import TaskModal from '../components/TaskModal';
 import UploadForm from '../components/UploadForm';
 
-export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, onAddSchedule, onAddTask, availableCourses = [], activityLogs = [] }) {
+export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, onAddSchedule, onAddTask, availableCourses = [], activityLogs = [], onActionNotice, onLogAction }) {
   const [notifications, setNotifications] = useState(true);
   const [demoResetMsg, setDemoResetMsg] = useState('');
   
@@ -18,8 +18,8 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
   const [isFullWeeklyScheduleOpen, setIsFullWeeklyScheduleOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
 
-  // Section Hide Toggles
-  const [hideActivityLog, setHideActivityLog] = useState(false);
+  // Section Hide Toggles (Activity Log hidden by default!)
+  const [hideActivityLog, setHideActivityLog] = useState(true);
   const [hideCVSection, setHideCVSection] = useState(false);
   const [hideInputSection, setHideInputSection] = useState(false);
   const [hideSettingsSection, setHideSettingsSection] = useState(false);
@@ -31,7 +31,6 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
   const [semester, setSemester] = useState(user?.semester || 6);
   const [photoURL, setPhotoURL] = useState(user?.photoURL || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80');
 
-  // Achievements State (CV ATS Engine)
   const [achievements, setAchievements] = useState([
     {
       id: 'ach-1',
@@ -57,6 +56,8 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
 
   const handleResetData = () => {
     localStorage.clear();
+    if (onActionNotice) onActionNotice('Data demo berhasil di-reset!');
+    if (onLogAction) onLogAction('Reset LocalStorage', 'Memuat ulang data aplikasi bawaan');
     setDemoResetMsg('Data demo berhasil di-reset!');
     setTimeout(() => {
       window.location.reload();
@@ -69,6 +70,8 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
       const reader = new FileReader();
       reader.onloadend = () => {
         setPhotoURL(reader.result);
+        if (onActionNotice) onActionNotice('Foto profil baru berhasil diperbarui!');
+        if (onLogAction) onLogAction('Update Foto Profil', 'Mengunggah foto profil baru');
       };
       reader.readAsDataURL(file);
     }
@@ -78,6 +81,8 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
     e.preventDefault();
     const updatedUser = { ...user, displayName, prodi, semester: parseInt(semester), photoURL };
     localStorage.setItem('kating_user', JSON.stringify(updatedUser));
+    if (onActionNotice) onActionNotice('Profil berhasil diperbarui!');
+    if (onLogAction) onLogAction('Update Profil', `Nama: ${displayName}, Sem: ${semester}`);
     setIsEditingProfile(false);
     window.location.reload();
   };
@@ -87,6 +92,8 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
     setTimeout(() => {
       try {
         generateATSCV(user, achievements);
+        if (onActionNotice) onActionNotice('CV ATS (PDF) berhasil dibuat dan diunduh!');
+        if (onLogAction) onLogAction('Ekspor CV ATS', 'Mengunduh berkas PDF CV ATS');
       } catch (err) {
         console.error("PDF Export error:", err);
       } finally {
@@ -97,10 +104,15 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
 
   const handleAddAchievement = (newAch) => {
     setAchievements([newAch, ...achievements]);
+    if (onActionNotice) onActionNotice(`Prestasi "${newAch.title}" berhasil disimpan!`);
+    if (onLogAction) onLogAction('Tambah Prestasi', newAch.title);
   };
 
   const handleDeleteAchievement = (id) => {
+    const itemToDelete = achievements.find(a => a.id === id);
     setAchievements(achievements.filter(a => a.id !== id));
+    if (onActionNotice) onActionNotice(`Prestasi "${itemToDelete?.title || ''}" telah dihapus`, 'delete');
+    if (onLogAction) onLogAction('Hapus Prestasi', itemToDelete?.title || id);
   };
 
   const daysList = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
@@ -147,7 +159,7 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
         </div>
       )}
 
-      {/* Activity Log Section (Log Aktivitas Pengguna) */}
+      {/* Activity Log Section (Hidden by default to save space!) */}
       <div className="card">
         <div className="section-row">
           <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
@@ -155,15 +167,15 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
           </span>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span className="badge badge-green">{activityLogs.length} Aktivitas</span>
-            <button onClick={() => setHideActivityLog(!hideActivityLog)} className="icon-btn">
-              {hideActivityLog ? <ChevronDown size={13} /> : <ChevronUp size={13} />}
+            <span className="badge badge-green">{activityLogs.length} Log</span>
+            <button onClick={() => setHideActivityLog(!hideActivityLog)} className="icon-btn" title="Buka / Sembunyikan Log">
+              {hideActivityLog ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
             </button>
           </div>
         </div>
 
         {!hideActivityLog && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', maxHeight: '180px', overflowY: 'auto' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', maxHeight: '180px', overflowY: 'auto', marginTop: '6px' }}>
             {activityLogs.length > 0 ? (
               activityLogs.map((log) => (
                 <div key={log.id} className="list-item" style={{ padding: '6px 10px' }}>
@@ -215,7 +227,7 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
         )}
       </div>
 
-      {/* Central Input Management & Full Weekly Schedule Viewer Section */}
+      {/* Central Input Management Section */}
       <div className="card">
         <div className="section-row">
           <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
@@ -399,7 +411,7 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
 
               <div style={{ display: 'flex', gap: '6px', marginTop: '14px' }}>
                 <button type="button" className="btn-ghost" onClick={() => setIsEditingProfile(false)}>Batal</button>
-                <button type="submit" className="btn">Simpan Perubahan</button>
+                <button type="submit" className="btn">Simpan</button>
               </div>
             </form>
           </div>
