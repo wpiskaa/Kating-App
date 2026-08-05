@@ -23,7 +23,7 @@ export default function Login({ onLoginSuccess }) {
         ...DEMO_USER,
         displayName: displayName || email.split('@')[0].toUpperCase(),
         email: email,
-        prodi: 'Belum diisi', // Akan diisi di Profil saat sudah login
+        prodi: 'Belum diisi',
         semester: 1
       };
       localStorage.setItem('kating_user', JSON.stringify(userObj));
@@ -88,8 +88,8 @@ export default function Login({ onLoginSuccess }) {
         <h1 className="h1 grad-text" style={{ fontSize: '26px', fontWeight: 800, letterSpacing: '-0.02em' }}>
           Kating App
         </h1>
-        <p className="muted" style={{ fontSize: '12px', marginTop: '4px', maxWidth: '300px', margin: '4px auto 0', lineHeight: 1.4 }}>
-          Asisten Akademik & Keuangan Terintegrasi Mahasiswa Masa Kini
+        <p className="muted" style={{ fontSize: '12.5px', marginTop: '4px', maxWidth: '280px', margin: '4px auto 0', lineHeight: 1.4 }}>
+          Teman Setia Perjalanan Perkuliahanmu
         </p>
       </div>
 
