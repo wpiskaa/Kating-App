@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import MemberProgressBar from '../components/MemberProgressBar';
-import TaskModal from '../components/TaskModal';
+import ConfirmModal from '../components/ConfirmModal';
 import { FolderKanban, CheckSquare, ShieldAlert, UserPlus, Plus, Trash2, X, Users, ArrowLeft, User, PlusCircle } from 'lucide-react';
 
 export default function ProjectWorkspace({ currentUser, availableCourses = [], onActionNotice, onLogAction }) {
@@ -14,6 +14,9 @@ export default function ProjectWorkspace({ currentUser, availableCourses = [], o
   ]);
   const [newPersonalTitle, setNewPersonalTitle] = useState('');
   const [isAddPersonalOpen, setIsAddPersonalOpen] = useState(false);
+
+  // Deletion Confirmation State
+  const [taskToDelete, setTaskToDelete] = useState(null);
 
   // Multi-Group List
   const [groups, setGroups] = useState([
@@ -53,7 +56,7 @@ export default function ProjectWorkspace({ currentUser, availableCourses = [], o
   const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
   const [newSubtaskAssignee, setNewSubtaskAssignee] = useState('mem-1');
 
-  // Actions with Toast Notification & Activity Log
+  // Actions
   const handleAddPersonalTask = (e) => {
     e.preventDefault();
     if (!newPersonalTitle) return;
@@ -74,12 +77,14 @@ export default function ProjectWorkspace({ currentUser, availableCourses = [], o
     if (onLogAction) onLogAction('Ubah Status Tugas', taskObj?.title || id);
   };
 
-  const handleDeletePersonalTask = (id) => {
-    const taskObj = personalTasks.find(t => t.id === id);
-    setPersonalTasks(personalTasks.filter(t => t.id !== id));
+  // Confirmed Deletion
+  const confirmDeletePersonalTask = () => {
+    if (!taskToDelete) return;
+    setPersonalTasks(personalTasks.filter(t => t.id !== taskToDelete.id));
 
-    if (onActionNotice) onActionNotice(`Tugas "${taskObj?.title || ''}" dihapus`, 'delete');
-    if (onLogAction) onLogAction('Hapus Tugas Mandiri', taskObj?.title || id);
+    if (onActionNotice) onActionNotice(`Tugas "${taskToDelete.title}" telah dihapus`, 'delete');
+    if (onLogAction) onLogAction('Hapus Tugas Mandiri', taskToDelete.title);
+    setTaskToDelete(null);
   };
 
   const handleCreateGroup = (e) => {
@@ -206,7 +211,7 @@ export default function ProjectWorkspace({ currentUser, availableCourses = [], o
                   <span className="dim" style={{ display: 'block' }}>{t.subject} • {t.deadline}</span>
                 </div>
 
-                <button onClick={(e) => { e.stopPropagation(); handleDeletePersonalTask(t.id); }} className="icon-btn">
+                <button onClick={(e) => { e.stopPropagation(); setTaskToDelete(t); }} className="icon-btn" title="Hapus Tugas">
                   <Trash2 size={12} color="#fb7185" />
                 </button>
               </div>
@@ -322,7 +327,16 @@ export default function ProjectWorkspace({ currentUser, availableCourses = [], o
         </>
       )}
 
-      {/* Modals */}
+      {/* Confirmation Modal for Task Delete */}
+      <ConfirmModal
+        isOpen={Boolean(taskToDelete)}
+        title="Konfirmasi Hapus Tugas"
+        message={`Apakah kamu yakin ingin menghapus tugas "${taskToDelete?.title || ''}"?`}
+        onConfirm={confirmDeletePersonalTask}
+        onCancel={() => setTaskToDelete(null)}
+      />
+
+      {/* Other Modals */}
       {isAddPersonalOpen && (
         <div className="overlay" onClick={() => setIsAddPersonalOpen(false)}>
           <div className="sheet" onClick={(e) => e.stopPropagation()}>

@@ -5,6 +5,7 @@ import { generateATSCV } from '../utils/pdfEngine';
 import ScheduleModal from '../components/ScheduleModal';
 import TaskModal from '../components/TaskModal';
 import UploadForm from '../components/UploadForm';
+import ConfirmModal from '../components/ConfirmModal';
 
 export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, onAddSchedule, onAddTask, availableCourses = [], activityLogs = [], onActionNotice, onLogAction }) {
   const [notifications, setNotifications] = useState(true);
@@ -18,7 +19,11 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
   const [isFullWeeklyScheduleOpen, setIsFullWeeklyScheduleOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
 
-  // Section Hide Toggles (Activity Log hidden by default!)
+  // Deletion Confirmation States
+  const [achToDelete, setAchToDelete] = useState(null);
+  const [isConfirmResetOpen, setIsConfirmResetOpen] = useState(false);
+
+  // Section Hide Toggles
   const [hideActivityLog, setHideActivityLog] = useState(true);
   const [hideCVSection, setHideCVSection] = useState(false);
   const [hideInputSection, setHideInputSection] = useState(false);
@@ -54,10 +59,11 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
     }
   ]);
 
-  const handleResetData = () => {
+  const confirmResetData = () => {
     localStorage.clear();
     if (onActionNotice) onActionNotice('Data demo berhasil di-reset!');
     if (onLogAction) onLogAction('Reset LocalStorage', 'Memuat ulang data aplikasi bawaan');
+    setIsConfirmResetOpen(false);
     setDemoResetMsg('Data demo berhasil di-reset!');
     setTimeout(() => {
       window.location.reload();
@@ -108,11 +114,13 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
     if (onLogAction) onLogAction('Tambah Prestasi', newAch.title);
   };
 
-  const handleDeleteAchievement = (id) => {
-    const itemToDelete = achievements.find(a => a.id === id);
-    setAchievements(achievements.filter(a => a.id !== id));
-    if (onActionNotice) onActionNotice(`Prestasi "${itemToDelete?.title || ''}" telah dihapus`, 'delete');
-    if (onLogAction) onLogAction('Hapus Prestasi', itemToDelete?.title || id);
+  // Confirmed Achievement Delete
+  const confirmDeleteAchievement = () => {
+    if (!achToDelete) return;
+    setAchievements(achievements.filter(a => a.id !== achToDelete.id));
+    if (onActionNotice) onActionNotice(`Prestasi "${achToDelete.title}" telah dihapus`, 'delete');
+    if (onLogAction) onLogAction('Hapus Prestasi', achToDelete.title);
+    setAchToDelete(null);
   };
 
   const daysList = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
@@ -159,7 +167,7 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
         </div>
       )}
 
-      {/* Activity Log Section (Hidden by default to save space!) */}
+      {/* Activity Log Section */}
       <div className="card">
         <div className="section-row">
           <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
@@ -309,7 +317,7 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-          <button onClick={handleResetData} className="btn-ghost" style={{ justifyContent: 'space-between' }}>
+          <button onClick={() => setIsConfirmResetOpen(true)} className="btn-ghost" style={{ justifyContent: 'space-between' }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
               <RefreshCw size={13} color="#22d3ee" /> Reset LocalStorage Demo
             </span>
@@ -324,6 +332,24 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
           </button>
         </div>
       </div>
+
+      {/* Confirmation Modal for Reset Data */}
+      <ConfirmModal
+        isOpen={isConfirmResetOpen}
+        title="Reset Seluruh Data LocalStorage"
+        message="Apakah kamu yakin ingin mereset seluruh data aplikasi ke pengaturan awal bawaan pabrik?"
+        onConfirm={confirmResetData}
+        onCancel={() => setIsConfirmResetOpen(false)}
+      />
+
+      {/* Confirmation Modal for Achievement Delete */}
+      <ConfirmModal
+        isOpen={Boolean(achToDelete)}
+        title="Konfirmasi Hapus Dokumen Prestasi"
+        message={`Apakah kamu yakin ingin menghapus berkas prestasi "${achToDelete?.title || ''}" dari brankas?`}
+        onConfirm={confirmDeleteAchievement}
+        onCancel={() => setAchToDelete(null)}
+      />
 
       {/* FULL WEEKLY SCHEDULE VIEWER MODAL */}
       {isFullWeeklyScheduleOpen && (
@@ -443,7 +469,7 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
                     <span className="dim">{item.role} • {item.institution} ({item.date})</span>
                   </div>
 
-                  <button onClick={() => handleDeleteAchievement(item.id)} className="icon-btn">
+                  <button onClick={() => setAchToDelete(item)} className="icon-btn" title="Hapus Prestasi">
                     <Trash2 size={13} color="#fb7185" />
                   </button>
                 </div>

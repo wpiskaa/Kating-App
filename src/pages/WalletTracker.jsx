@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import ExpenseModal from '../components/ExpenseModal';
+import ConfirmModal from '../components/ConfirmModal';
 import { calculateSafeDailyBudget, getDaysRemainingInMonth, checkOverBudget, formatIDR } from '../utils/financialCalculations';
 import { Wallet, AlertCircle, Plus, ArrowDownRight, ShoppingBag, Trash2, Edit2, X, CreditCard, Clock, ChevronUp, ChevronDown } from 'lucide-react';
 
@@ -11,6 +12,9 @@ export default function WalletTracker({ onActionNotice, onLogAction }) {
   // Hide Toggles
   const [hideCardHero, setHideCardHero] = useState(false);
   const [hideHistorySection, setHideHistorySection] = useState(false);
+
+  // Deletion Confirmation State
+  const [expenseToDelete, setExpenseToDelete] = useState(null);
 
   const [expenses, setExpenses] = useState([
     { id: 'exp-1', title: 'Makan Rutin Warmindo', amount: 18000, category: 'Makan & Minum', location: 'Warmindo War-Kun', date: new Date().toISOString() },
@@ -45,13 +49,15 @@ export default function WalletTracker({ onActionNotice, onLogAction }) {
     if (onLogAction) onLogAction('Catat Transaksi', `${newExpense.title} [${formatIDR(newExpense.amount)}]`);
   };
 
-  const handleDeleteExpense = (id, amount) => {
-    const itemObj = expenses.find(e => e.id === id);
-    setExpenses(expenses.filter(e => e.id !== id));
-    setCurrentBalance((prev) => prev + amount);
+  // Confirmed Expense Deletion
+  const confirmDeleteExpense = () => {
+    if (!expenseToDelete) return;
+    setExpenses(expenses.filter(e => e.id !== expenseToDelete.id));
+    setCurrentBalance((prev) => prev + expenseToDelete.amount);
 
-    if (onActionNotice) onActionNotice(`Transaksi "${itemObj?.title || ''}" dihapus`, 'delete');
-    if (onLogAction) onLogAction('Hapus Transaksi', itemObj?.title || id);
+    if (onActionNotice) onActionNotice(`Transaksi "${expenseToDelete.title}" telah dihapus`, 'delete');
+    if (onLogAction) onLogAction('Hapus Transaksi', expenseToDelete.title);
+    setExpenseToDelete(null);
   };
 
   const handleSaveBudget = (e) => {
@@ -184,7 +190,7 @@ export default function WalletTracker({ onActionNotice, onLogAction }) {
 
                   <span className="mono h4" style={{ color: '#fb7185' }}>-{formatIDR(item.amount)}</span>
 
-                  <button onClick={() => handleDeleteExpense(item.id, item.amount)} className="icon-btn" title="Hapus Transaksi">
+                  <button onClick={() => setExpenseToDelete(item)} className="icon-btn" title="Hapus Transaksi">
                     <Trash2 size={12} color="#fb7185" />
                   </button>
                 </div>
@@ -193,6 +199,15 @@ export default function WalletTracker({ onActionNotice, onLogAction }) {
           </>
         )}
       </div>
+
+      {/* Confirmation Modal for Expense Delete */}
+      <ConfirmModal
+        isOpen={Boolean(expenseToDelete)}
+        title="Konfirmasi Hapus Transaksi"
+        message={`Apakah kamu yakin ingin menghapus transaksi "${expenseToDelete?.title || ''}" sebesar ${formatIDR(expenseToDelete?.amount || 0)}?`}
+        onConfirm={confirmDeleteExpense}
+        onCancel={() => setExpenseToDelete(null)}
+      />
 
       {/* Modal Edit Budget */}
       {isEditBudgetOpen && (
