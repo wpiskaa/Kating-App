@@ -10,7 +10,6 @@ import { getCurrentSessionUser, subscribeAuthChange, DEMO_USER } from './service
 
 export default function App() {
   const [user, setUser] = useState(() => getCurrentSessionUser() || DEMO_USER);
-  const [viewMode, setViewMode] = useState('mobile'); // 'mobile' | 'tablet' | 'fluid'
 
   useEffect(() => {
     const unsubscribe = subscribeAuthChange((currentUser) => {
@@ -36,10 +35,10 @@ export default function App() {
   return (
     <Router>
       <div className="app-viewport-wrapper">
-        <div className={`mobile-app-shell ${viewMode}-mode`} style={{ marginTop: '30px' }}>
-          <Navbar user={user} onLogout={handleLogout} viewMode={viewMode} setViewMode={setViewMode} />
+        <div className="mobile-app-shell">
+          <Navbar user={user} onLogout={handleLogout} />
           
-          <div className="app-page-content">
+          <div className="page-container">
             <Routes>
               <Route path="/" element={<Dashboard user={user} />} />
               <Route path="/projects" element={<ProjectWorkspace currentUser={user} />} />

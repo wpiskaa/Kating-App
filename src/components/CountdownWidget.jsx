@@ -1,19 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, AlertTriangle, CheckCircle, ArrowRight } from 'lucide-react';
+import { Clock, AlertCircle } from 'lucide-react';
 
 export default function CountdownWidget({ tasks }) {
   const [sortedTasks, setSortedTasks] = useState([]);
   const [now, setNow] = useState(Date.now());
 
-  // Update timer every second
   useEffect(() => {
-    const interval = setInterval(() => {
-      setNow(Date.now());
-    }, 1000);
+    const interval = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(interval);
   }, []);
 
-  // Sort tasks dynamically by closest deadline timestamp
   useEffect(() => {
     if (!tasks) return;
     const sorted = [...tasks].sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime());
@@ -24,9 +20,7 @@ export default function CountdownWidget({ tasks }) {
     const target = new Date(deadlineStr).getTime();
     const diff = target - now;
 
-    if (diff <= 0) {
-      return { expired: true, text: "Waktu Habis!", hoursLeft: 0 };
-    }
+    if (diff <= 0) return { expired: true, text: "Waktu Habis!", hoursLeft: 0 };
 
     const totalSeconds = Math.floor(diff / 1000);
     const hours = Math.floor(totalSeconds / 3600);
@@ -37,13 +31,12 @@ export default function CountdownWidget({ tasks }) {
     return {
       expired: false,
       text: `${pad(hours)}j ${pad(minutes)}m ${pad(seconds)}d`,
-      hoursLeft: hours,
-      diff
+      hoursLeft: hours
     };
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
       {sortedTasks.map((task) => {
         const timeObj = calculateTimeRemaining(task.deadline);
         const isUrgent = !timeObj.expired && timeObj.hoursLeft < 24;
@@ -52,56 +45,44 @@ export default function CountdownWidget({ tasks }) {
           <div
             key={task.id}
             style={{
-              padding: '1.1rem',
-              borderRadius: 'var(--radius-md)',
-              backgroundColor: isUrgent ? 'rgba(239, 68, 68, 0.08)' : 'var(--bg-card)',
-              border: isUrgent ? '1px solid var(--danger)' : '1px solid var(--border-color)',
+              padding: '0.85rem 1rem',
+              borderRadius: 'var(--radius-inner)',
+              backgroundColor: isUrgent ? 'rgba(244, 63, 94, 0.08)' : 'rgba(255, 255, 255, 0.03)',
+              border: isUrgent ? '1px solid rgba(244, 63, 94, 0.3)' : '1px solid var(--border-subtle)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              gap: '1rem'
+              gap: '0.75rem'
             }}
           >
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
-                <h4 style={{ fontSize: '1.05rem', fontWeight: 700 }}>{task.title}</h4>
-                <span className={`badge ${task.category === 'Kelompok' ? 'badge-info' : 'badge-warning'}`}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.15rem' }}>
+                <h4 style={{ fontSize: '0.85rem', fontWeight: 700 }}>{task.title}</h4>
+                <span className={`pill-badge ${task.category === 'Kelompok' ? 'pill-info' : 'pill-warning'}`}>
                   {task.category}
                 </span>
               </div>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                {task.subject} • Matkul {task.code}
-              </p>
+              <p style={{ fontSize: '0.725rem', color: 'var(--text-tertiary)' }}>{task.subject}</p>
             </div>
 
-            {/* Countdown Badge */}
             <div style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '0.625rem',
-              backgroundColor: isUrgent ? 'rgba(239, 68, 68, 0.2)' : 'var(--bg-secondary)',
-              padding: '0.5rem 0.85rem',
-              borderRadius: 'var(--radius-md)',
-              border: isUrgent ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid var(--border-color)'
+              gap: '0.35rem',
+              backgroundColor: isUrgent ? 'rgba(244, 63, 94, 0.15)' : 'rgba(255, 255, 255, 0.05)',
+              padding: '0.35rem 0.65rem',
+              borderRadius: 'var(--radius-pill)',
+              border: isUrgent ? '1px solid rgba(244, 63, 94, 0.3)' : '1px solid var(--border-subtle)'
             }}>
-              {isUrgent ? (
-                <AlertTriangle size={18} color="#ef4444" className="pulse-icon" />
-              ) : (
-                <Clock size={18} color="#06b6d4" />
-              )}
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                <span style={{
-                  fontSize: '0.95rem',
-                  fontWeight: 800,
-                  fontFamily: 'monospace',
-                  color: isUrgent ? '#f87171' : '#38bdf8'
-                }}>
-                  {timeObj.text}
-                </span>
-                <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>
-                  {isUrgent ? 'Batas Kritis < 24 Jam' : 'Sisa Batas Tenggat'}
-                </span>
-              </div>
+              {isUrgent ? <AlertCircle size={13} color="#f43f5e" /> : <Clock size={13} color="#06b6d4" />}
+              <span style={{
+                fontSize: '0.8rem',
+                fontWeight: 700,
+                fontFamily: 'JetBrains Mono, monospace',
+                color: isUrgent ? '#fb7185' : '#38bdf8'
+              }}>
+                {timeObj.text}
+              </span>
             </div>
           </div>
         );

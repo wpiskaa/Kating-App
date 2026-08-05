@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, PlusCircle, DollarSign, Tag, FileText } from 'lucide-react';
+import { X } from 'lucide-react';
 
 export default function ExpenseModal({ isOpen, onClose, onAddExpense }) {
   const [title, setTitle] = useState('');
@@ -27,114 +27,72 @@ export default function ExpenseModal({ isOpen, onClose, onAddExpense }) {
     onClose();
   };
 
-  const setPreset = (presetTitle, presetAmount, presetCategory, presetLocation) => {
-    setTitle(presetTitle);
-    setAmount(presetAmount);
-    setCategory(presetCategory);
-    setLocation(presetLocation);
+  const setPreset = (pTitle, pAmount, pCategory, pLocation) => {
+    setTitle(pTitle);
+    setAmount(pAmount);
+    setCategory(pCategory);
+    setLocation(pLocation);
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-          <h3 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Tambah Transaksi Pengeluaran Cepat</h3>
-          <button onClick={onClose} style={{ background: 'none', color: 'var(--text-muted)' }}>
-            <X size={20} />
+    <div className="modal-backdrop" onClick={onClose}>
+      <div className="modal-sheet" onClick={(e) => e.stopPropagation()}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+          <h3 style={{ fontSize: '1.05rem', fontWeight: 700 }}>Catat Pengeluaran Cepat</h3>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--text-tertiary)', cursor: 'pointer' }}>
+            <X size={18} />
           </button>
         </div>
 
-        {/* Quick Presets for Mahasiswa */}
-        <div style={{ marginBottom: '1.25rem' }}>
-          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.5rem' }}>
-            Preset Cepat Skenario SRS:
-          </span>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-            <button
-              type="button"
-              className="btn-secondary"
-              style={{ fontSize: '0.75rem', padding: '0.35rem 0.65rem' }}
-              onClick={() => setPreset('Makan Rutin Warmindo', '18000', 'Makan & Minum', 'Warmindo War-Kun')}
-            >
-              🍜 Warmindo War-Kun (Rp 18k)
-            </button>
-            <button
-              type="button"
-              className="btn-secondary"
-              style={{ fontSize: '0.75rem', padding: '0.35rem 0.65rem' }}
-              onClick={() => setPreset('Nongkrong & Tugas', '25000', 'Hiburan / Kopi', 'Kopi Jahat Tamantirto')}
-            >
-              ☕ Kopi Jahat Tamantirto (Rp 25k)
-            </button>
-            <button
-              type="button"
-              className="btn-secondary"
-              style={{ fontSize: '0.75rem', padding: '0.35rem 0.65rem' }}
-              onClick={() => setPreset('Cetak Berkas Lab', '12000', 'Akademik', 'Fotocopy Kampus')}
-            >
-              🖨️ Cetak Berkas (Rp 12k)
-            </button>
-          </div>
+        {/* SRS Presets */}
+        <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', marginBottom: '1.15rem' }}>
+          <button type="button" className="pill-badge pill-info" onClick={() => setPreset('Warmindo Rutin', '18000', 'Makan & Minum', 'Warmindo War-Kun')}>
+            🍜 Warmindo (18k)
+          </button>
+          <button type="button" className="pill-badge pill-warning" onClick={() => setPreset('Kopi Jahat', '25000', 'Hiburan / Kopi', 'Kopi Jahat Tamantirto')}>
+            ☕ Kopi Jahat (25k)
+          </button>
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label className="form-label">Deskripsi Pengeluaran</label>
+          <div className="form-field">
+            <label className="form-label-clean">Deskripsi Transaksi</label>
             <input
               type="text"
-              className="form-input"
-              placeholder="Contoh: Makan Siang Nasi Goreng"
+              className="form-input-clean"
+              placeholder="Contoh: Makan Siang Warmindo"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
             />
           </div>
 
-          <div className="form-group">
-            <label className="form-label">Nominal Pengeluaran (Rp)</label>
+          <div className="form-field">
+            <label className="form-label-clean">Nominal (Rp)</label>
             <input
               type="number"
-              className="form-input"
-              placeholder="Contoh: 18000"
+              className="form-input-clean"
+              placeholder="18000"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               required
             />
           </div>
 
-          <div className="form-group">
-            <label className="form-label">Lokasi / Tempat</label>
+          <div className="form-field">
+            <label className="form-label-clean">Lokasi</label>
             <input
               type="text"
-              className="form-input"
-              placeholder="Warmindo War-Kun / Kopi Jahat Tamantirto"
+              className="form-input-clean"
+              placeholder="Warmindo War-Kun"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
             />
           </div>
 
-          <div className="form-group">
-            <label className="form-label">Kategori</label>
-            <select
-              className="form-select"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-            >
-              <option value="Makan & Minum">Makan & Minum</option>
-              <option value="Hiburan / Kopi">Hiburan / Kopi</option>
-              <option value="Akademik">Akademik & Print</option>
-              <option value="Transportasi">Transportasi</option>
-              <option value="Lain-lain">Lain-lain</option>
-            </select>
-          </div>
-
-          <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
-            <button type="button" className="btn-secondary" style={{ flex: 1 }} onClick={onClose}>
-              Batal
-            </button>
-            <button type="submit" className="btn-primary" style={{ flex: 1, justifyContent: 'center' }}>
-              Simpan Transaksi
-            </button>
+          <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem' }}>
+            <button type="button" className="btn-minimal-secondary" onClick={onClose}>Batal</button>
+            <button type="submit" className="btn-minimal">Simpan</button>
           </div>
         </form>
       </div>

@@ -6,7 +6,7 @@ export default function ProjectWorkspace({ currentUser }) {
   const [projectDeadline] = useState(new Date(Date.now() + 18 * 3600 * 1000).toISOString());
 
   const [members, setMembers] = useState([
-    { id: "mem-1", name: "Hafiz Kurniawan (Anda)", role: "Frontend Lead", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80", totalSubtasks: 3, completedSubtasks: 2 },
+    { id: "mem-1", name: "Hafiz Kurniawan", role: "Frontend Lead", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80", totalSubtasks: 3, completedSubtasks: 2 },
     { id: "mem-2", name: "Ilham", role: "Backend Architect", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=250&q=80", totalSubtasks: 3, completedSubtasks: 3 },
     { id: "mem-3", name: "Rian Prasetya", role: "Database Analyst", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=250&q=80", totalSubtasks: 2, completedSubtasks: 0 } // Flagged Critical
   ]);
@@ -17,7 +17,7 @@ export default function ProjectWorkspace({ currentUser }) {
     { id: 'st-3', title: '1-Click ATS Resume Generator', assignedTo: 'mem-1', completed: false },
     { id: 'st-4', title: 'Inisialisasi Firestore NoSQL', assignedTo: 'mem-2', completed: true },
     { id: 'st-5', title: 'Penulisan firestore.rules Security', assignedTo: 'mem-2', completed: true },
-    { id: 'st-6', title: 'Skrip Cloud Functions Automated Flagging', assignedTo: 'mem-2', completed: true },
+    { id: 'st-6', title: 'Skrip Cloud Functions Flagging', assignedTo: 'mem-2', completed: true },
     { id: 'st-7', title: 'Skema Normalisasi Relasi Koleksi', assignedTo: 'mem-3', completed: false },
     { id: 'st-8', title: 'Kamus Data Sub-tugas & Indexing', assignedTo: 'mem-3', completed: false }
   ]);
@@ -45,53 +45,42 @@ export default function ProjectWorkspace({ currentUser }) {
 
   return (
     <>
-      <div className="mobile-card" style={{
-        background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(17, 24, 39, 0.95) 100%)',
-        border: '1px solid rgba(239, 68, 68, 0.4)'
+      <div className="card-clean" style={{
+        background: 'linear-gradient(135deg, rgba(244, 63, 94, 0.12) 0%, var(--bg-card) 100%)',
+        border: '1px solid rgba(244, 63, 94, 0.3)'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
-          <ShieldAlert size={22} color="#ef4444" />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <ShieldAlert size={18} color="#f43f5e" />
           <div>
-            <h2 style={{ fontSize: '1.1rem', fontWeight: 800 }}>Drama-Free Project Manager</h2>
-            <p style={{ fontSize: '0.75rem', color: '#f87171', marginTop: '0.15rem' }}>
+            <h2 style={{ fontSize: '1rem', fontWeight: 800 }}>Drama-Free Project Manager</h2>
+            <p style={{ fontSize: '0.725rem', color: '#fb7185' }}>
               Tenggat Akhir Proyek: 18 Jam Lagi
             </p>
           </div>
         </div>
       </div>
 
-      <div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-          <h3 style={{ fontSize: '1rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-            <Users size={18} color="#818cf8" />
-            Progres Individu Anggota
-          </h3>
-          <span style={{ fontSize: '0.675rem', color: 'var(--text-muted)' }}>FR-2.3 Flagging 0%</span>
-        </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-          {members.map((member) => (
-            <MemberProgressBar
-              key={member.id}
-              member={member}
-              projectDeadline={projectDeadline}
-            />
-          ))}
-        </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
+        {members.map((member) => (
+          <MemberProgressBar
+            key={member.id}
+            member={member}
+            projectDeadline={projectDeadline}
+          />
+        ))}
       </div>
 
-      <div className="mobile-card">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem' }}>
-          <h3 className="mobile-card-title">
-            <FolderGit2 size={18} color="#06b6d4" />
-            Sub-Tugas Proyek
-          </h3>
-          <span className="badge badge-info">
+      <div className="card-clean">
+        <div className="card-clean-title">
+          <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <FolderGit2 size={16} color="#06b6d4" /> Sub-Tugas Tim
+          </span>
+          <span className="pill-badge pill-info">
             {subtasks.filter(t => t.completed).length}/{subtasks.length} Selesai
           </span>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
           {subtasks.map((task) => {
             const assignedMember = members.find(m => m.id === task.assignedTo);
             return (
@@ -99,10 +88,10 @@ export default function ProjectWorkspace({ currentUser }) {
                 key={task.id}
                 onClick={() => handleToggleSubtask(task.id, task.assignedTo)}
                 style={{
-                  padding: '0.75rem 0.85rem',
-                  borderRadius: 'var(--radius-md)',
-                  backgroundColor: task.completed ? 'rgba(16, 185, 129, 0.08)' : 'var(--bg-secondary)',
-                  border: task.completed ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid var(--border-color)',
+                  padding: '0.65rem 0.85rem',
+                  borderRadius: 'var(--radius-inner)',
+                  backgroundColor: task.completed ? 'rgba(16, 185, 129, 0.06)' : 'rgba(255, 255, 255, 0.03)',
+                  border: task.completed ? '1px solid rgba(16, 185, 129, 0.25)' : '1px solid var(--border-subtle)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
@@ -110,26 +99,26 @@ export default function ProjectWorkspace({ currentUser }) {
                   cursor: 'pointer'
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', overflow: 'hidden' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', overflow: 'hidden' }}>
                   <div style={{
-                    width: '20px',
-                    height: '20px',
+                    width: '18px',
+                    height: '18px',
                     borderRadius: '5px',
-                    backgroundColor: task.completed ? 'var(--success)' : 'transparent',
-                    border: task.completed ? 'none' : '1.5px solid var(--text-muted)',
+                    backgroundColor: task.completed ? 'var(--accent-emerald)' : 'transparent',
+                    border: task.completed ? 'none' : '1.5px solid var(--text-tertiary)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     color: 'white',
                     flexShrink: 0
                   }}>
-                    {task.completed && <CheckSquare size={14} />}
+                    {task.completed && <CheckSquare size={12} />}
                   </div>
                   <span style={{
-                    fontSize: '0.85rem',
+                    fontSize: '0.8rem',
                     fontWeight: 600,
                     textDecoration: task.completed ? 'line-through' : 'none',
-                    color: task.completed ? 'var(--text-muted)' : 'var(--text-main)',
+                    color: task.completed ? 'var(--text-tertiary)' : 'var(--text-primary)',
                     whiteSpace: 'nowrap',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis'
@@ -141,7 +130,7 @@ export default function ProjectWorkspace({ currentUser }) {
                 <img
                   src={assignedMember?.avatar}
                   alt={assignedMember?.name}
-                  style={{ width: '22px', height: '22px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
+                  style={{ width: '20px', height: '20px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
                   title={assignedMember?.name}
                 />
               </div>

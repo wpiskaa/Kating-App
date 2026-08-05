@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import ExpenseModal from '../components/ExpenseModal';
 import { calculateSafeDailyBudget, getDaysRemainingInMonth, checkOverBudget, formatIDR } from '../utils/financialCalculations';
-import { Wallet, AlertTriangle, Plus, ArrowDownRight, ShoppingBag, ShieldCheck, MapPin } from 'lucide-react';
+import { Wallet, AlertCircle, Plus, ArrowDownRight, ShoppingBag } from 'lucide-react';
 
 export default function WalletTracker() {
-  const [totalAllowance, setTotalAllowance] = useState(1500000);
   const [currentBalance, setCurrentBalance] = useState(980000);
   const [expenses, setExpenses] = useState([
     { id: 'exp-1', title: 'Makan Rutin Warmindo', amount: 18000, category: 'Makan & Minum', location: 'Warmindo War-Kun', date: new Date().toISOString() },
@@ -29,87 +28,83 @@ export default function WalletTracker() {
 
   return (
     <>
-      {/* Mobile Safe Limit Banner */}
-      <div className={`mobile-card ${isOverSafeLimit ? 'wallet-warning' : ''}`}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+      <div className={`card-clean ${isOverSafeLimit ? 'wallet-alert-card' : ''}`}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-            <Wallet size={18} color={isOverSafeLimit ? '#ef4444' : '#818cf8'} />
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+            <Wallet size={16} color={isOverSafeLimit ? '#f43f5e' : '#818cf8'} />
+            <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
               Batas Aman Belanja Harian (FR-3.3)
             </span>
           </div>
-          <span className={`badge ${isOverSafeLimit ? 'badge-danger' : 'badge-success'}`}>
+          <span className={`pill-badge ${isOverSafeLimit ? 'pill-danger' : 'pill-success'}`}>
             {isOverSafeLimit ? 'Over Limit' : 'Aman'}
           </span>
         </div>
 
         <h2 style={{
-          fontSize: '1.75rem',
+          fontSize: '1.6rem',
           fontWeight: 800,
-          color: isOverSafeLimit ? '#ef4444' : '#38bdf8',
-          fontFamily: 'monospace',
+          color: isOverSafeLimit ? '#fb7185' : '#38bdf8',
+          fontFamily: 'JetBrains Mono, monospace',
           lineHeight: 1.1
         }}>
-          {formatIDR(safeDailyBudget)} <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>/ Hari</span>
+          {formatIDR(safeDailyBudget)} <span style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)' }}>/ Hari</span>
         </h2>
 
-        <p style={{ fontSize: '0.725rem', color: 'var(--text-muted)', marginTop: '0.35rem' }}>
-          Formula: (Saldo {formatIDR(currentBalance)}) / ({daysRemaining} Sisa Hari)
+        <p style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', marginTop: '0.25rem' }}>
+          Saldo {formatIDR(currentBalance)} • {daysRemaining} Sisa Hari
         </p>
 
         {isOverSafeLimit && (
           <div style={{
-            marginTop: '0.75rem',
-            padding: '0.5rem 0.65rem',
-            backgroundColor: 'rgba(239, 68, 68, 0.25)',
-            border: '1px solid #ef4444',
-            borderRadius: 'var(--radius-sm)',
-            color: '#f87171',
-            fontSize: '0.75rem',
+            marginTop: '0.625rem',
+            padding: '0.45rem 0.65rem',
+            backgroundColor: 'rgba(244, 63, 94, 0.15)',
+            border: '1px solid rgba(244, 63, 94, 0.3)',
+            borderRadius: 'var(--radius-inner)',
+            color: '#fb7185',
+            fontSize: '0.725rem',
             display: 'flex',
             alignItems: 'center',
             gap: '0.35rem'
           }}>
-            <AlertTriangle size={14} color="#ef4444" />
+            <AlertCircle size={13} />
             <span>Pengeluaran hari ini ({formatIDR(todayExpensesSum)}) melebihi Batas Aman!</span>
           </div>
         )}
 
-        <div style={{ marginTop: '1rem' }}>
-          <button className="btn-mobile-primary" onClick={() => setIsModalOpen(true)}>
-            <Plus size={16} /> Catat Pengeluaran Cepat
+        <div style={{ marginTop: '0.85rem' }}>
+          <button className="btn-minimal" onClick={() => setIsModalOpen(true)}>
+            <Plus size={16} /> Catat Pengeluaran
           </button>
         </div>
       </div>
 
-      {/* Mini Financial Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
-        <div className="mobile-card" style={{ padding: '0.85rem 1rem' }}>
-          <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Total Saldo</span>
-          <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#38bdf8', marginTop: '0.15rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.625rem' }}>
+        <div className="card-clean" style={{ padding: '0.75rem 0.85rem' }}>
+          <span style={{ fontSize: '0.675rem', color: 'var(--text-tertiary)' }}>Total Saldo</span>
+          <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#38bdf8', marginTop: '0.1rem' }}>
             {formatIDR(currentBalance)}
           </h3>
         </div>
 
-        <div className="mobile-card" style={{ padding: '0.85rem 1rem' }}>
-          <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Keluar Hari Ini</span>
-          <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: isOverSafeLimit ? '#f87171' : '#34d399', marginTop: '0.15rem' }}>
+        <div className="card-clean" style={{ padding: '0.75rem 0.85rem' }}>
+          <span style={{ fontSize: '0.675rem', color: 'var(--text-tertiary)' }}>Keluar Hari Ini</span>
+          <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: isOverSafeLimit ? '#fb7185' : '#34d399', marginTop: '0.1rem' }}>
             {formatIDR(todayExpensesSum)}
           </h3>
         </div>
       </div>
 
-      {/* Transactions List */}
-      <div className="mobile-card">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem' }}>
-          <h3 className="mobile-card-title">
-            <ShoppingBag size={18} color="#818cf8" />
-            Arus Kas Keluar Harian (FR-3.2)
-          </h3>
-          <span className="badge badge-info">{expenses.length} Transaksi</span>
+      <div className="card-clean">
+        <div className="card-clean-title">
+          <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <ShoppingBag size={16} color="#818cf8" /> Arus Kas Keluar Harian
+          </span>
+          <span className="pill-badge pill-info">{expenses.length} Transaksi</span>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
           {expenses.map((item) => (
             <div
               key={item.id}
@@ -117,30 +112,28 @@ export default function WalletTracker() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                padding: '0.75rem 0.85rem',
-                borderRadius: 'var(--radius-md)',
-                backgroundColor: 'var(--bg-secondary)',
-                border: '1px solid var(--border-color)'
+                padding: '0.65rem 0.85rem',
+                borderRadius: 'var(--radius-inner)',
+                backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                border: '1px solid var(--border-subtle)'
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <div style={{
-                  background: 'rgba(239, 68, 68, 0.15)',
-                  padding: '0.4rem',
-                  borderRadius: 'var(--radius-sm)',
-                  color: '#f87171'
+                  background: 'rgba(244, 63, 94, 0.12)',
+                  padding: '0.35rem',
+                  borderRadius: '8px',
+                  color: '#fb7185'
                 }}>
-                  <ArrowDownRight size={18} />
+                  <ArrowDownRight size={15} />
                 </div>
                 <div>
-                  <h4 style={{ fontSize: '0.875rem', fontWeight: 700 }}>{item.title}</h4>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-                    <span><MapPin size={10} style={{ display: 'inline' }} /> {item.location}</span>
-                  </div>
+                  <h4 style={{ fontSize: '0.825rem', fontWeight: 700 }}>{item.title}</h4>
+                  <span style={{ fontSize: '0.675rem', color: 'var(--text-tertiary)' }}>{item.location}</span>
                 </div>
               </div>
 
-              <span style={{ fontSize: '0.9rem', fontWeight: 800, color: '#f87171' }}>
+              <span style={{ fontSize: '0.85rem', fontWeight: 800, color: '#fb7185', fontFamily: 'JetBrains Mono, monospace' }}>
                 -{formatIDR(item.amount)}
               </span>
             </div>
