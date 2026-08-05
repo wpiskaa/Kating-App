@@ -9,6 +9,7 @@ import WalletTracker from './pages/WalletTracker';
 import AchievementVault from './pages/AchievementVault';
 import ChatWorkspace from './pages/ChatWorkspace';
 import ProfileSettings from './pages/ProfileSettings';
+import AppSettings from './pages/AppSettings';
 import { getCurrentSessionUser, subscribeAuthChange, DEMO_USER } from './services/authService';
 
 const DEFAULT_SEMESTER_DATASETS = {
@@ -152,13 +153,24 @@ export default function App() {
                 element={
                   <ProfileSettings
                     user={user}
-                    onLogout={handleLogout}
-                    theme={theme}
-                    onToggleTheme={toggleTheme}
                     onAddSchedule={handleAddSchedule}
                     onAddTask={handleAddTask}
                     availableCourses={activeSchedules}
+                    onActionNotice={showToast}
+                    onLogAction={logActivity}
+                  />
+                }
+              />
+              <Route
+                path="/settings"
+                element={
+                  <AppSettings
+                    theme={theme}
+                    onToggleTheme={toggleTheme}
                     activityLogs={activityLogs}
+                    onLogout={handleLogout}
+                    onActionNotice={showToast}
+                    onLogAction={logActivity}
                   />
                 }
               />

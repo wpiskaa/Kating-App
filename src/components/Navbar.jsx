@@ -1,125 +1,108 @@
 import React, { useState } from 'react';
-import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, FolderKanban, Wallet, User, Sparkles, Bell, X, AlertTriangle, Megaphone, MessageSquare } from 'lucide-react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { Home, FolderKanban, Wallet, MessageSquare, User, Bell, CheckCircle2, QrCode, Settings } from 'lucide-react';
+import QRCodeModal from './QRCodeModal';
 
 export default function Navbar({ user }) {
-  const [isNotifOpen, setIsNotifOpen] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(2);
+  const navigate = useNavigate();
+  const [isNotifDrawerOpen, setIsNotifDrawerOpen] = useState(false);
+  const [isQRModalOpen, setIsQRModalOpen] = useState(false);
 
-  // 5 Clean Bottom Nav items (CV ATS moved into Profile)
-  const navItems = [
-    { path: '/', label: 'Dasbor', icon: LayoutDashboard },
-    { path: '/projects', label: 'Proyek', icon: FolderKanban },
-    { path: '/wallet', label: 'Dompet', icon: Wallet },
-    { path: '/chat', label: 'Chat', icon: MessageSquare },
-    { path: '/profile', label: 'Profil', icon: User },
-  ];
-
-  const notificationsList = [
-    { id: 1, type: 'alert', title: 'Tenggat Kritis < 24 Jam', text: 'Riset PAB Multi-Spectral belum diselesaikan!', time: '10m lalu' },
-    { id: 2, type: 'announcement', title: 'Info Kompetisi Mahasiswa', text: 'Pendaftaran Hackathon Mahasiswa Nasional 2026 dibuka.', time: '1j lalu' }
+  const notifications = [
+    { id: 1, title: 'Pengingat Deadline Tugas', time: '10m lalu', desc: 'Tugas PAB2026 sisa <18 jam!' },
+    { id: 2, title: 'Permintaan Teman Mutual', time: '1j lalu', desc: 'Ilham mengirim permintaan berteman' }
   ];
 
   return (
     <>
-      {/* Top Header */}
+      {/* Top Mobile App Header */}
       <header className="header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <div className="icon-box-sm" style={{ background: 'var(--g-indigo-cyan)' }}>
-            <Sparkles size={14} color="white" />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div className="nav-dot" style={{ background: 'var(--g-brand)', color: 'white', width: '26px', height: '26px' }}>
+            <span style={{ fontWeight: 800, fontSize: '12px' }}>K</span>
           </div>
-          <span className="h3 grad-text">Kating</span>
+          <span className="h3 grad-text" style={{ fontSize: '15px' }}>Kating App</span>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          {/* Chat Message Icon */}
-          <NavLink to="/chat" className="icon-btn" title="Chat & Teman Mutual">
-            <MessageSquare size={16} color="#22d3ee" />
-          </NavLink>
-
-          {/* Notification Bell */}
-          <button
-            onClick={() => { setIsNotifOpen(true); setUnreadCount(0); }}
-            className="icon-btn"
-            style={{ position: 'relative' }}
-            title="Notifikasi & Informasi"
-          >
-            <Bell size={16} />
-            {unreadCount > 0 && (
-              <span style={{
-                position: 'absolute', top: -2, right: -2, background: 'var(--rose)', color: 'white',
-                fontSize: '8px', fontWeight: 800, borderRadius: '50%', width: '13px', height: '13px',
-                display: 'flex', alignItems: 'center', justifyContent: 'center'
-              }}>
-                {unreadCount}
-              </span>
-            )}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <button onClick={() => setIsQRModalOpen(true)} className="icon-btn" title="QR Code Profil Mahasiswa">
+            <QrCode size={17} color="#22d3ee" />
           </button>
 
-          {user && (
-            <NavLink to="/profile" style={{ display: 'flex', alignItems: 'center', gap: '6px', textDecoration: 'none' }}>
-              <img
-                src={user.photoURL}
-                alt={user.displayName}
-                style={{ width: '24px', height: '24px', borderRadius: '50%', objectFit: 'cover', border: '1.5px solid var(--indigo)' }}
-              />
-            </NavLink>
-          )}
+          <button onClick={() => setIsNotifDrawerOpen(true)} className="icon-btn" style={{ position: 'relative' }} title="Notifikasi Pengumuman">
+            <Bell size={17} color="#818cf8" />
+            <span style={{
+              position: 'absolute', top: 2, right: 2, width: '6px', height: '6px',
+              borderRadius: '50%', background: '#f43f5e'
+            }} />
+          </button>
+
+          <button onClick={() => navigate('/settings')} className="icon-btn" title="Pengaturan Sistem Aplikasi">
+            <Settings size={17} color="var(--text-2)" />
+          </button>
         </div>
       </header>
 
-      {/* Clean 5-Item Bottom Nav */}
+      {/* Bottom 5-Item Native Mobile Navigation Bar */}
       <nav className="bottom-nav">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          return (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
-            >
-              <div className="nav-dot">
-                <Icon size={16} />
-              </div>
-              <span>{item.label}</span>
-            </NavLink>
-          );
-        })}
+        <NavLink to="/" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+          <div className="nav-dot"><Home size={18} /></div>
+          <span>Dasbor</span>
+        </NavLink>
+
+        <NavLink to="/projects" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+          <div className="nav-dot"><FolderKanban size={18} /></div>
+          <span>Proyek</span>
+        </NavLink>
+
+        <NavLink to="/wallet" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+          <div className="nav-dot"><Wallet size={18} /></div>
+          <span>Dompet</span>
+        </NavLink>
+
+        <NavLink to="/chat" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+          <div className="nav-dot"><MessageSquare size={18} /></div>
+          <span>Chat</span>
+        </NavLink>
+
+        <NavLink to="/profile" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+          <div className="nav-dot"><User size={18} /></div>
+          <span>Profil</span>
+        </NavLink>
       </nav>
 
-      {/* Notification Drawer Modal */}
-      {isNotifOpen && (
-        <div className="overlay" onClick={() => setIsNotifOpen(false)}>
+      {/* Notifications Drawer */}
+      {isNotifDrawerOpen && (
+        <div className="overlay" onClick={() => setIsNotifDrawerOpen(false)}>
           <div className="sheet" onClick={(e) => e.stopPropagation()}>
             <div className="drag-handle" />
             <div className="section-row">
-              <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                <Bell size={14} color="#22d3ee" /> Notifikasi Informasi
-              </span>
-              <button onClick={() => setIsNotifOpen(false)} className="icon-btn"><X size={16} /></button>
+              <span className="h3">Notifikasi Sistem & Pengumuman</span>
+              <button onClick={() => setIsNotifDrawerOpen(false)} className="icon-btn">✕</button>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', margin: '8px 0' }}>
-              {notificationsList.map(n => (
-                <div key={n.id} className="list-item" style={{ borderLeft: n.type === 'alert' ? '3px solid var(--rose)' : '3px solid var(--cyan)' }}>
-                  <div className="icon-box-sm" style={{ background: n.type === 'alert' ? 'rgba(244,63,94,0.15)' : 'rgba(34,211,238,0.15)', color: n.type === 'alert' ? '#fb7185' : '#22d3ee' }}>
-                    {n.type === 'alert' ? <AlertTriangle size={13} /> : <Megaphone size={13} />}
+              {notifications.map((item) => (
+                <div key={item.id} className="list-item">
+                  <div className="icon-box-sm" style={{ background: 'rgba(99,102,241,0.15)', color: '#818cf8' }}>
+                    <CheckCircle2 size={14} />
                   </div>
                   <div style={{ flex: 1 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span className="h4">{n.title}</span>
-                      <span className="dim">{n.time}</span>
-                    </div>
-                    <span className="muted" style={{ fontSize: '10px' }}>{n.text}</span>
+                    <span className="h4">{item.title}</span>
+                    <span className="dim" style={{ display: 'block' }}>{item.desc}</span>
                   </div>
+                  <span className="dim">{item.time}</span>
                 </div>
               ))}
             </div>
 
-            <button className="btn" onClick={() => setIsNotifOpen(false)}>Tutup</button>
+            <button className="btn-ghost" onClick={() => setIsNotifDrawerOpen(false)}>Tutup</button>
           </div>
         </div>
       )}
+
+      {/* QR Code Modal */}
+      <QRCodeModal isOpen={isQRModalOpen} onClose={() => setIsQRModalOpen(false)} user={user} />
     </>
   );
 }

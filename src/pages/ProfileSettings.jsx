@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
-import { UserCheck, Shield, Moon, Sun, Bell, RefreshCw, LogOut, CheckCircle2, ChevronRight, Sliders, Edit2, X, PlusCircle, BookOpen, CheckSquare, Camera, Upload, Award, FileText, Sparkles, Trash2, Plus, Calendar, ChevronUp, ChevronDown, Activity, Clock } from 'lucide-react';
-import { logoutUser } from '../services/authService';
+import { useNavigate } from 'react-router-dom';
+import { UserCheck, Edit2, X, PlusCircle, BookOpen, CheckSquare, Camera, Upload, Award, FileText, Sparkles, Trash2, Plus, Calendar, Settings, ChevronRight } from 'lucide-react';
 import { generateATSCV } from '../utils/pdfEngine';
 import ScheduleModal from '../components/ScheduleModal';
 import TaskModal from '../components/TaskModal';
 import UploadForm from '../components/UploadForm';
 import ConfirmModal from '../components/ConfirmModal';
 
-export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, onAddSchedule, onAddTask, availableCourses = [], activityLogs = [], onActionNotice, onLogAction }) {
-  const [notifications, setNotifications] = useState(true);
-  const [demoResetMsg, setDemoResetMsg] = useState('');
+export default function ProfileSettings({ user, onAddSchedule, onAddTask, availableCourses = [], onActionNotice, onLogAction }) {
+  const navigate = useNavigate();
   
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
@@ -19,15 +18,8 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
   const [isFullWeeklyScheduleOpen, setIsFullWeeklyScheduleOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
 
-  // Deletion Confirmation States
+  // Deletion Confirmation State
   const [achToDelete, setAchToDelete] = useState(null);
-  const [isConfirmResetOpen, setIsConfirmResetOpen] = useState(false);
-
-  // Section Hide Toggles
-  const [hideActivityLog, setHideActivityLog] = useState(true);
-  const [hideCVSection, setHideCVSection] = useState(false);
-  const [hideInputSection, setHideInputSection] = useState(false);
-  const [hideSettingsSection, setHideSettingsSection] = useState(false);
 
   const [activeDayTab, setActiveDayTab] = useState('Senin');
 
@@ -58,17 +50,6 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
       fileName: 'Berkas_Finalisasi_Riset.pdf'
     }
   ]);
-
-  const confirmResetData = () => {
-    localStorage.clear();
-    if (onActionNotice) onActionNotice('Data demo berhasil di-reset!');
-    if (onLogAction) onLogAction('Reset LocalStorage', 'Memuat ulang data aplikasi bawaan');
-    setIsConfirmResetOpen(false);
-    setDemoResetMsg('Data demo berhasil di-reset!');
-    setTimeout(() => {
-      window.location.reload();
-    }, 800);
-  };
 
   const handlePhotoUpload = (e) => {
     const file = e.target.files[0];
@@ -114,7 +95,6 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
     if (onLogAction) onLogAction('Tambah Prestasi', newAch.title);
   };
 
-  // Confirmed Achievement Delete
   const confirmDeleteAchievement = () => {
     if (!achToDelete) return;
     setAchievements(achievements.filter(a => a.id !== achToDelete.id));
@@ -135,11 +115,11 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
               <img
                 src={photoURL}
                 alt={displayName}
-                style={{ width: '46px', height: '46px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--indigo)' }}
+                style={{ width: '48px', height: '48px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--indigo)' }}
               />
               <label htmlFor="profile-photo-input-main" style={{
                 position: 'absolute', bottom: -2, right: -2, background: 'var(--indigo)', color: 'white',
-                borderRadius: '50%', padding: '3px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                borderRadius: '50%', padding: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center'
               }}>
                 <Camera size={10} />
               </label>
@@ -161,45 +141,20 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
         </div>
       </div>
 
-      {demoResetMsg && (
-        <div className="badge badge-green" style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '6px 10px' }}>
-          <CheckCircle2 size={12} /> {demoResetMsg}
-        </div>
-      )}
-
-      {/* Activity Log Section */}
-      <div className="card">
-        <div className="section-row">
-          <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <Activity size={15} color="#34d399" /> Log Aktivitas Pengguna
-          </span>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span className="badge badge-green">{activityLogs.length} Log</span>
-            <button onClick={() => setHideActivityLog(!hideActivityLog)} className="icon-btn" title="Buka / Sembunyikan Log">
-              {hideActivityLog ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
-            </button>
+      {/* Link to App Settings Page */}
+      <div className="card" onClick={() => navigate('/settings')} style={{ cursor: 'pointer', background: 'linear-gradient(135deg, rgba(34,211,238,0.08) 0%, var(--bg-card) 100%)', border: '1px solid rgba(34,211,238,0.2)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div className="icon-box-sm" style={{ background: 'rgba(34,211,238,0.15)', color: '#22d3ee' }}>
+              <Settings size={16} />
+            </div>
+            <div>
+              <span className="h3">Pengaturan Sistem Aplikasi</span>
+              <span className="dim" style={{ display: 'block' }}>Tema, Notifikasi, Log Aktivitas, Sesi & Reset</span>
+            </div>
           </div>
+          <ChevronRight size={16} color="var(--text-3)" />
         </div>
-
-        {!hideActivityLog && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', maxHeight: '180px', overflowY: 'auto', marginTop: '6px' }}>
-            {activityLogs.length > 0 ? (
-              activityLogs.map((log) => (
-                <div key={log.id} className="list-item" style={{ padding: '6px 10px' }}>
-                  <Clock size={12} color="#818cf8" style={{ flexShrink: 0 }} />
-                  <div style={{ flex: 1 }}>
-                    <span className="h4" style={{ fontSize: '10px' }}>{log.action}</span>
-                    <span className="dim" style={{ display: 'block', fontSize: '8.5px' }}>{log.detail}</span>
-                  </div>
-                  <span className="dim" style={{ fontSize: '8.5px' }}>{log.time}</span>
-                </div>
-              ))
-            ) : (
-              <div className="dim" style={{ textAlign: 'center', padding: '10px' }}>Belum ada riwayat aktivitas.</div>
-            )}
-          </div>
-        )}
       </div>
 
       {/* CV ATS & Brankas Prestasi Section */}
@@ -208,31 +163,21 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
           <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
             <Award size={15} color="#818cf8" /> Brankas Prestasi & CV ATS
           </span>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span className="badge badge-cyan">{achievements.length} Dokumen</span>
-            <button onClick={() => setHideCVSection(!hideCVSection)} className="icon-btn">
-              {hideCVSection ? <ChevronDown size={13} /> : <ChevronUp size={13} />}
-            </button>
-          </div>
+          <span className="badge badge-cyan">{achievements.length} Dokumen</span>
         </div>
 
-        {!hideCVSection && (
-          <>
-            <p className="dim" style={{ marginBottom: '10px' }}>
-              Ekstrak otomatis metadata prestasi ke format PDF Resume ATS-friendly.
-            </p>
+        <p className="dim" style={{ marginBottom: '10px' }}>
+          Ekstrak otomatis metadata prestasi ke format PDF Resume ATS-friendly.
+        </p>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '6px' }}>
-              <button className="btn" onClick={handle1ClickCVExport} disabled={isExporting}>
-                <Sparkles size={13} /> {isExporting ? 'Proses...' : 'Ekspor CV ATS (PDF)'}
-              </button>
-              <button className="btn-ghost" onClick={() => setIsCVModalOpen(true)}>
-                <FileText size={13} /> Kelola Prestasi
-              </button>
-            </div>
-          </>
-        )}
+        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '6px' }}>
+          <button className="btn" onClick={handle1ClickCVExport} disabled={isExporting}>
+            <Sparkles size={13} /> {isExporting ? 'Proses...' : 'Ekspor CV ATS (PDF)'}
+          </button>
+          <button className="btn-ghost" onClick={() => setIsCVModalOpen(true)}>
+            <FileText size={13} /> Kelola Prestasi
+          </button>
+        </div>
       </div>
 
       {/* Central Input Management Section */}
@@ -241,106 +186,31 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
           <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
             <PlusCircle size={14} color="#22d3ee" /> Kelola Akademik (Semester {semester})
           </span>
-
-          <button onClick={() => setHideInputSection(!hideInputSection)} className="icon-btn">
-            {hideInputSection ? <ChevronDown size={13} /> : <ChevronUp size={13} />}
-          </button>
-        </div>
-
-        {!hideInputSection && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <button onClick={() => setIsFullWeeklyScheduleOpen(true)} className="btn-ghost" style={{ justifyContent: 'space-between', borderColor: 'rgba(99,102,241,0.3)', color: '#818cf8' }}>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <Calendar size={13} color="#818cf8" /> Lihat Lengkap Jadwal Kuliah (Senin - Sabtu)
-              </span>
-              <span className="badge badge-blue">Senin - Sabtu</span>
-            </button>
-
-            <button onClick={() => setIsScheduleModalOpen(true)} className="btn-ghost" style={{ justifyContent: 'space-between' }}>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <BookOpen size={13} color="#818cf8" /> Input Jadwal Perkuliahan
-              </span>
-              <span className="badge badge-blue">+ Tambah</span>
-            </button>
-
-            <button onClick={() => setIsTaskModalOpen(true)} className="btn-ghost" style={{ justifyContent: 'space-between' }}>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <CheckSquare size={13} color="#22d3ee" /> Input Tugas Matkul Semester Ini
-              </span>
-              <span className="badge badge-cyan">+ Tambah</span>
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* Preferences Section */}
-      <div className="card">
-        <div className="section-row">
-          <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <Sliders size={14} color="#818cf8" /> Pengaturan Sistem
-          </span>
-
-          <button onClick={() => setHideSettingsSection(!hideSettingsSection)} className="icon-btn">
-            {hideSettingsSection ? <ChevronDown size={13} /> : <ChevronUp size={13} />}
-          </button>
-        </div>
-
-        {!hideSettingsSection && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <div className="list-item" style={{ justifyContent: 'space-between', cursor: 'pointer' }} onClick={onToggleTheme}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                {theme === 'dark' ? <Moon size={14} color="#818cf8" /> : <Sun size={14} color="#fbbf24" />}
-                <span className="h4">{theme === 'dark' ? 'Mode Malam (Dark)' : 'Mode Siang (Light)'}</span>
-              </div>
-              <span className="badge badge-blue">{theme === 'dark' ? 'Gelap' : 'Terang'}</span>
-            </div>
-
-            <div className="list-item" style={{ justifyContent: 'space-between', cursor: 'pointer' }} onClick={() => setNotifications(!notifications)}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <Bell size={14} color="#22d3ee" />
-                <span className="h4">Notifikasi Deadline</span>
-              </div>
-              <span className={`badge ${notifications ? 'badge-green' : 'badge-red'}`}>
-                {notifications ? 'Aktif' : 'Mati'}
-              </span>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Danger Zone */}
-      <div className="card">
-        <div className="section-row">
-          <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <Shield size={14} color="#fbbf24" /> Sesi & Data
-          </span>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-          <button onClick={() => setIsConfirmResetOpen(true)} className="btn-ghost" style={{ justifyContent: 'space-between' }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-              <RefreshCw size={13} color="#22d3ee" /> Reset LocalStorage Demo
+          <button onClick={() => setIsFullWeeklyScheduleOpen(true)} className="btn-ghost" style={{ justifyContent: 'space-between', borderColor: 'rgba(99,102,241,0.3)', color: '#818cf8' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Calendar size={13} color="#818cf8" /> Lihat Lengkap Jadwal Kuliah (Senin - Sabtu)
             </span>
-            <ChevronRight size={13} className="dim" />
+            <span className="badge badge-blue">Senin - Sabtu</span>
           </button>
 
-          <button onClick={async () => { await logoutUser(); onLogout(); }} className="btn-ghost" style={{ justifyContent: 'space-between', borderColor: 'rgba(244,63,94,0.3)', color: '#fb7185' }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-              <LogOut size={13} color="#fb7185" /> Keluar Sesi Akun
+          <button onClick={() => setIsScheduleModalOpen(true)} className="btn-ghost" style={{ justifyContent: 'space-between' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <BookOpen size={13} color="#818cf8" /> Input Jadwal Perkuliahan
             </span>
-            <ChevronRight size={13} color="#fb7185" />
+            <span className="badge badge-blue">+ Tambah</span>
+          </button>
+
+          <button onClick={() => setIsTaskModalOpen(true)} className="btn-ghost" style={{ justifyContent: 'space-between' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <CheckSquare size={13} color="#22d3ee" /> Input Tugas Matkul Semester Ini
+            </span>
+            <span className="badge badge-cyan">+ Tambah</span>
           </button>
         </div>
       </div>
-
-      {/* Confirmation Modal for Reset Data */}
-      <ConfirmModal
-        isOpen={isConfirmResetOpen}
-        title="Reset Seluruh Data LocalStorage"
-        message="Apakah kamu yakin ingin mereset seluruh data aplikasi ke pengaturan awal bawaan pabrik?"
-        onConfirm={confirmResetData}
-        onCancel={() => setIsConfirmResetOpen(false)}
-      />
 
       {/* Confirmation Modal for Achievement Delete */}
       <ConfirmModal
