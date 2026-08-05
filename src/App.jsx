@@ -10,6 +10,7 @@ import { getCurrentSessionUser, subscribeAuthChange, DEMO_USER } from './service
 
 export default function App() {
   const [user, setUser] = useState(() => getCurrentSessionUser() || DEMO_USER);
+  const [viewMode, setViewMode] = useState('mobile'); // 'mobile' | 'tablet' | 'fluid'
 
   useEffect(() => {
     const unsubscribe = subscribeAuthChange((currentUser) => {
@@ -34,17 +35,20 @@ export default function App() {
 
   return (
     <Router>
-      <div className="app-container" style={{ flexDirection: 'column' }}>
-        <Navbar user={user} onLogout={handleLogout} />
-        <main className="main-content">
-          <Routes>
-            <Route path="/" element={<Dashboard user={user} />} />
-            <Route path="/projects" element={<ProjectWorkspace currentUser={user} />} />
-            <Route path="/wallet" element={<WalletTracker />} />
-            <Route path="/achievements" element={<AchievementVault currentUser={user} />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </main>
+      <div className="app-viewport-wrapper">
+        <div className={`mobile-app-shell ${viewMode}-mode`} style={{ marginTop: '30px' }}>
+          <Navbar user={user} onLogout={handleLogout} viewMode={viewMode} setViewMode={setViewMode} />
+          
+          <div className="app-page-content">
+            <Routes>
+              <Route path="/" element={<Dashboard user={user} />} />
+              <Route path="/projects" element={<ProjectWorkspace currentUser={user} />} />
+              <Route path="/wallet" element={<WalletTracker />} />
+              <Route path="/achievements" element={<AchievementVault currentUser={user} />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </div>
+        </div>
       </div>
     </Router>
   );
