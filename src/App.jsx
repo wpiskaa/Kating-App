@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard';
 import ProjectWorkspace from './pages/ProjectWorkspace';
 import WalletTracker from './pages/WalletTracker';
 import AchievementVault from './pages/AchievementVault';
+import ChatWorkspace from './pages/ChatWorkspace';
 import ProfileSettings from './pages/ProfileSettings';
 import { getCurrentSessionUser, subscribeAuthChange, DEMO_USER } from './services/authService';
 
@@ -39,6 +40,10 @@ export default function App() {
     setUser(null);
   };
 
+  if (!user) {
+    return <Login onLoginSuccess={handleLoginSuccess} />;
+  }
+
   return (
     <Router>
       <div className="viewport">
@@ -51,6 +56,7 @@ export default function App() {
               <Route path="/projects" element={<ProjectWorkspace currentUser={user} />} />
               <Route path="/wallet" element={<WalletTracker />} />
               <Route path="/achievements" element={<AchievementVault currentUser={user} />} />
+              <Route path="/chat" element={<ChatWorkspace currentUser={user} />} />
               <Route
                 path="/profile"
                 element={

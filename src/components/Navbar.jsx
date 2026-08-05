@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, FolderKanban, Wallet, Award, User, Sparkles, Bell, X, AlertTriangle, Megaphone, CheckCircle2 } from 'lucide-react';
+import { LayoutDashboard, FolderKanban, Wallet, Award, User, Sparkles, Bell, X, AlertTriangle, Megaphone, MessageSquare } from 'lucide-react';
 
 export default function Navbar({ user }) {
   const [isNotifOpen, setIsNotifOpen] = useState(false);
@@ -11,12 +11,13 @@ export default function Navbar({ user }) {
     { path: '/projects', label: 'Proyek', icon: FolderKanban },
     { path: '/wallet', label: 'Dompet', icon: Wallet },
     { path: '/achievements', label: 'CV ATS', icon: Award },
+    { path: '/chat', label: 'Chat', icon: MessageSquare },
     { path: '/profile', label: 'Profil', icon: User },
   ];
 
   const notificationsList = [
     { id: 1, type: 'alert', title: 'Tenggat Kritis < 24 Jam', text: 'Riset PAB Multi-Spectral belum diselesaikan!', time: '10m lalu' },
-    { id: 2, type: 'announcement', title: 'Pengumuman KRS Semester 7', text: 'Pengisian KRS dibuka mulai tanggal 10 Agustus 2026.', time: '1j lalu' }
+    { id: 2, type: 'announcement', title: 'Info Kompetisi Mahasiswa', text: 'Pendaftaran Hackathon Mahasiswa Nasional 2026 dibuka.', time: '1j lalu' }
   ];
 
   return (
@@ -30,13 +31,18 @@ export default function Navbar({ user }) {
           <span className="h3 grad-text">Kating</span>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {/* Chat Message Icon */}
+          <NavLink to="/chat" className="icon-btn" title="Chat & Teman Mutual">
+            <MessageSquare size={16} color="#22d3ee" />
+          </NavLink>
+
           {/* Notification Bell */}
           <button
             onClick={() => { setIsNotifOpen(true); setUnreadCount(0); }}
             className="icon-btn"
             style={{ position: 'relative' }}
-            title="Notifikasi & Pengumuman"
+            title="Notifikasi & Informasi"
           >
             <Bell size={16} />
             {unreadCount > 0 && (
@@ -52,7 +58,6 @@ export default function Navbar({ user }) {
 
           {user && (
             <NavLink to="/profile" style={{ display: 'flex', alignItems: 'center', gap: '6px', textDecoration: 'none' }}>
-              <span className="dim" style={{ fontWeight: 600 }}>{user.displayName?.split(' ')[0]}</span>
               <img
                 src={user.photoURL}
                 alt={user.displayName}
@@ -89,7 +94,7 @@ export default function Navbar({ user }) {
             <div className="drag-handle" />
             <div className="section-row">
               <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                <Bell size={14} color="#22d3ee" /> Notifikasi & Pengumuman
+                <Bell size={14} color="#22d3ee" /> Notifikasi Informasi
               </span>
               <button onClick={() => setIsNotifOpen(false)} className="icon-btn"><X size={16} /></button>
             </div>
@@ -111,7 +116,7 @@ export default function Navbar({ user }) {
               ))}
             </div>
 
-            <button className="btn" onClick={() => setIsNotifOpen(false)}>Tutup Notifikasi</button>
+            <button className="btn" onClick={() => setIsNotifOpen(false)}>Tutup</button>
           </div>
         </div>
       )}
