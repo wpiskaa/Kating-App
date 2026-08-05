@@ -14,6 +14,19 @@ export default function App() {
   const [user, setUser] = useState(() => getCurrentSessionUser() || DEMO_USER);
   const [theme, setTheme] = useState(() => localStorage.getItem('kating_theme') || 'dark');
 
+  // Central Schedules State (synced with active semester)
+  const [schedules, setSchedules] = useState([
+    { id: 1, day: "Rabu", semester: 6, subject: "Pemrograman Objek", time: "08:00 - 10:30", room: "Lab Komputer 3", lecturer: "Dr. Bambang", sks: 3, status: "Completed" },
+    { id: 2, day: "Rabu", semester: 6, subject: "Aplikasi Bergerak", time: "10:45 - 13:15", room: "Ruang Teori 402", lecturer: "Ahmad Wijaya", sks: 3, status: "Ongoing" },
+    { id: 3, day: "Kamis", semester: 6, subject: "Keamanan Jaringan", time: "14:00 - 16:30", room: "Ruang Teori 301", lecturer: "Siti Rahma", sks: 2, status: "Upcoming" }
+  ]);
+
+  // Central Tasks State
+  const [tasks, setTasks] = useState([
+    { id: 101, title: "Riset Multi-Spectral Sensing", subject: "Aplikasi Bergerak", code: "PAB2026", category: "Kelompok", deadline: new Date(Date.now() + 14 * 3600 * 1000).toISOString() },
+    { id: 102, title: "Tugas Mandiri Diagram UML", subject: "Pemrograman Objek", code: "PBO2026", category: "Mandiri", deadline: new Date(Date.now() + 48 * 3600 * 1000).toISOString() }
+  ]);
+
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('kating_theme', theme);
@@ -40,9 +53,13 @@ export default function App() {
     setUser(null);
   };
 
-  if (!user) {
-    return <Login onLoginSuccess={handleLoginSuccess} />;
-  }
+  const handleAddSchedule = (newSch) => {
+    setSchedules(prev => [...prev, newSch]);
+  };
+
+  const handleAddTask = (newTask) => {
+    setTasks(prev => [...prev, newTask]);
+  };
 
   return (
     <Router>
@@ -52,8 +69,8 @@ export default function App() {
           
           <main className="page">
             <Routes>
-              <Route path="/" element={<Dashboard user={user} />} />
-              <Route path="/projects" element={<ProjectWorkspace currentUser={user} />} />
+              <Route path="/" element={<Dashboard user={user} schedules={schedules} tasks={tasks} />} />
+              <Route path="/projects" element={<ProjectWorkspace currentUser={user} availableCourses={schedules} />} />
               <Route path="/wallet" element={<WalletTracker />} />
               <Route path="/achievements" element={<AchievementVault currentUser={user} />} />
               <Route path="/chat" element={<ChatWorkspace currentUser={user} />} />
@@ -65,8 +82,9 @@ export default function App() {
                     onLogout={handleLogout}
                     theme={theme}
                     onToggleTheme={toggleTheme}
-                    onAddSchedule={(sch) => console.log('Add Schedule:', sch)}
-                    onAddTask={(task) => console.log('Add Task:', task)}
+                    onAddSchedule={handleAddSchedule}
+                    onAddTask={handleAddTask}
+                    availableCourses={schedules}
                   />
                 }
               />

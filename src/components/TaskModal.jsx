@@ -1,11 +1,18 @@
 import React, { useState } from 'react';
-import { X } from 'lucide-react';
+import { X, Calendar } from 'lucide-react';
 
-export default function TaskModal({ isOpen, onClose, onAddTask }) {
+export default function TaskModal({ isOpen, onClose, onAddTask, availableCourses = [] }) {
   const [title, setTitle] = useState('');
-  const [subject, setSubject] = useState('');
+  const [subject, setSubject] = useState(availableCourses[0]?.subject || 'Pemrograman Objek');
   const [category, setCategory] = useState('Mandiri');
-  const [hoursDeadline, setHoursDeadline] = useState(24);
+  
+  // Date & Time Deadline fields
+  const [deadlineDate, setDeadlineDate] = useState(() => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tomorrow.toISOString().split('T')[0];
+  });
+  const [deadlineTime, setDeadlineTime] = useState('23:59');
 
   if (!isOpen) return null;
 
@@ -13,19 +20,23 @@ export default function TaskModal({ isOpen, onClose, onAddTask }) {
     e.preventDefault();
     if (!title) return;
 
-    const deadlineTimestamp = new Date(Date.now() + parseFloat(hoursDeadline) * 3600 * 1000).toISOString();
+    const fullDeadlineStr = `${deadlineDate}T${deadlineTime}:00`;
+    const deadlineObj = new Date(fullDeadlineStr);
+
+    const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const formattedDay = days[deadlineObj.getDay()];
+    const formattedDateStr = `${formattedDay}, ${deadlineObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })} ${deadlineTime}`;
 
     onAddTask({
       id: Date.now(),
       title,
-      subject: subject || 'Matkul',
-      code: 'MK2026',
+      subject: subject || 'Mata Kuliah',
       category,
-      deadline: deadlineTimestamp
+      deadline: deadlineObj.toISOString(),
+      formattedDeadline: formattedDateStr
     });
 
     setTitle('');
-    setSubject('');
     onClose();
   };
 
@@ -45,8 +56,20 @@ export default function TaskModal({ isOpen, onClose, onAddTask }) {
           </div>
 
           <div className="field">
-            <label className="field-label">Mata Kuliah</label>
-            <input type="text" className="field-input" placeholder="PAB / PBO" value={subject} onChange={(e) => setSubject(e.target.value)} />
+            <label className="field-label">Mata Kuliah Semester Ini</label>
+            <select className="field-select" value={subject} onChange={(e) => setSubject(e.target.value)}>
+              {availableCourses.length > 0 ? (
+                availableCourses.map((c, idx) => (
+                  <option key={idx} value={c.subject}>{c.subject} ({c.sks} SKS)</option>
+                ))
+              ) : (
+                <>
+                  <option value="Pemrograman Objek">Pemrograman Objek (3 SKS)</option>
+                  <option value="Aplikasi Bergerak">Aplikasi Bergerak (3 SKS)</option>
+                  <option value="Keamanan Jaringan">Keamanan Jaringan (2 SKS)</option>
+                </>
+              )}
+            </select>
           </div>
 
           <div className="field">
@@ -57,14 +80,28 @@ export default function TaskModal({ isOpen, onClose, onAddTask }) {
             </select>
           </div>
 
-          <div className="field">
-            <label className="field-label">Tenggat Waktu (Dalam Jam dari Sekarang)</label>
-            <select className="field-select" value={hoursDeadline} onChange={(e) => setHoursDeadline(e.target.value)}>
-              <option value={12}>12 Jam lagi (&lt;24j Alert)</option>
-              <option value={24}>24 Jam lagi (1 Hari)</option>
-              <option value={48}>48 Jam lagi (2 Hari)</option>
-              <option value={96}>96 Jam lagi (4 Hari)</option>
-            </select>
+          <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: '8px' }}>
+            <div className="field">
+              <label className="field-label">Tanggal Tenggat</label>
+              <input
+                type="date"
+                className="field-input"
+                value={deadlineDate}
+                onChange={(e) => setDeadlineDate(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="field">
+              <label className="field-label">Jam Tenggat</label>
+              <input
+                type="time"
+                className="field-input"
+                value={deadlineTime}
+                onChange={(e) => setDeadlineTime(e.target.value)}
+                required
+              />
+            </div>
           </div>
 
           <div style={{ display: 'flex', gap: '6px', marginTop: '14px' }}>

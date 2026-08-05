@@ -4,20 +4,9 @@ import CountdownWidget from '../components/CountdownWidget';
 import GPACalculatorModal from '../components/GPACalculatorModal';
 import { BookOpen, Clock, TrendingUp, Sparkles, Flame, Zap, Compass, Calculator } from 'lucide-react';
 
-export default function Dashboard({ user }) {
+export default function Dashboard({ user, schedules = [], tasks = [] }) {
   const [gpa, setGpa] = useState('3.88');
   const [isGPAModalOpen, setIsGPAModalOpen] = useState(false);
-
-  // Pure Read-Only Overview Data
-  const [schedules] = useState([
-    { id: 1, subject: "Pemrograman Objek", time: "08:00 - 10:30", room: "Lab Komputer 3", lecturer: "Dosen Pengampu", sks: 3, status: "Completed" },
-    { id: 2, subject: "Aplikasi Bergerak", time: "10:45 - 13:15", room: "Ruang Teori 402", lecturer: "Ahmad Wijaya", sks: 3, status: "Ongoing" }
-  ]);
-
-  const [tasks] = useState([
-    { id: 101, title: "Riset Multi-Spectral Sensing", subject: "Inovasi Perangkat", code: "PAB2026", category: "Kelompok", deadline: new Date(Date.now() + 14 * 3600 * 1000).toISOString() },
-    { id: 102, title: "Tugas Mandiri Diagram UML", subject: "Pemrograman Objek", code: "PBO2026", category: "Mandiri", deadline: new Date(Date.now() + 48 * 3600 * 1000).toISOString() }
-  ]);
 
   return (
     <>
@@ -70,7 +59,7 @@ export default function Dashboard({ user }) {
           </div>
           <div>
             <span className="label">Deadline &lt;24j</span>
-            <span className="h3 mono" style={{ display: 'block', color: '#fb7185' }}>1 Task</span>
+            <span className="h3 mono" style={{ display: 'block', color: '#fb7185' }}>{tasks.length} Task</span>
           </div>
         </div>
       </div>
@@ -90,9 +79,9 @@ export default function Dashboard({ user }) {
       <div className="card">
         <div className="section-row">
           <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <BookOpen size={14} color="#818cf8" /> Jadwal Perkuliahan Hari Ini
+            <BookOpen size={14} color="#818cf8" /> Jadwal Perkuliahan
           </span>
-          <span className="badge badge-blue">2 Matkul</span>
+          <span className="badge badge-blue">{schedules.length} Matkul</span>
         </div>
         <ScheduleList schedules={schedules} />
       </div>

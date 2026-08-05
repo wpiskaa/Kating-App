@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
 
-export default function ScheduleModal({ isOpen, onClose, onAddSchedule }) {
+export default function ScheduleModal({ isOpen, onClose, onAddSchedule, activeSemester }) {
+  const [day, setDay] = useState('Rabu');
   const [subject, setSubject] = useState('');
-  const [time, setTime] = useState('');
-  const [room, setRoom] = useState('');
-  const [lecturer, setLecturer] = useState('');
+  const [time, setTime] = useState('08:00 - 10:30');
+  const [room, setRoom] = useState('Lab Komputer 3');
+  const [lecturer, setLecturer] = useState('Ahmad Wijaya, M.Kom.');
   const [sks, setSks] = useState(3);
   const [status, setStatus] = useState('Upcoming');
 
@@ -17,18 +18,17 @@ export default function ScheduleModal({ isOpen, onClose, onAddSchedule }) {
 
     onAddSchedule({
       id: Date.now(),
+      day,
+      semester: activeSemester || 6,
       subject,
       time,
-      room: room || 'R. Teori',
-      lecturer: lecturer || 'Dosen pengampu',
+      room,
+      lecturer,
       sks: parseInt(sks),
       status
     });
 
     setSubject('');
-    setTime('');
-    setRoom('');
-    setLecturer('');
     onClose();
   };
 
@@ -37,19 +37,39 @@ export default function ScheduleModal({ isOpen, onClose, onAddSchedule }) {
       <div className="sheet" onClick={(e) => e.stopPropagation()}>
         <div className="drag-handle" />
         <div className="section-row">
-          <span className="h3">Tambah Jadwal Kuliah</span>
+          <span className="h3">Tambah Jadwal Perkuliahan</span>
           <button onClick={onClose} className="icon-btn"><X size={16} /></button>
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div className="field">
-            <label className="field-label">Mata Kuliah</label>
-            <input type="text" className="field-input" placeholder="Contoh: Pemrograman Mobile" value={subject} onChange={(e) => setSubject(e.target.value)} required />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+            <div className="field">
+              <label className="field-label">Hari Kuliah</label>
+              <select className="field-select" value={day} onChange={(e) => setDay(e.target.value)}>
+                <option value="Senin">Senin</option>
+                <option value="Selasa">Selasa</option>
+                <option value="Rabu">Rabu</option>
+                <option value="Kamis">Kamis</option>
+                <option value="Jumat">Jumat</option>
+                <option value="Sabtu">Sabtu</option>
+                <option value="Minggu">Minggu</option>
+              </select>
+            </div>
+
+            <div className="field">
+              <label className="field-label">Semester</label>
+              <input type="text" className="field-input" value={`Semester ${activeSemester || 6}`} disabled readOnly />
+            </div>
           </div>
 
           <div className="field">
-            <label className="field-label">Jam / Waktu Perkuliahan</label>
-            <input type="text" className="field-input" placeholder="Contoh: 08:00 - 10:30" value={time} onChange={(e) => setTime(e.target.value)} required />
+            <label className="field-label">Nama Mata Kuliah</label>
+            <input type="text" className="field-input" placeholder="Pemrograman Mobile" value={subject} onChange={(e) => setSubject(e.target.value)} required />
+          </div>
+
+          <div className="field">
+            <label className="field-label">Waktu (Jam Mulai - Selesai)</label>
+            <input type="text" className="field-input" placeholder="08:00 - 10:30" value={time} onChange={(e) => setTime(e.target.value)} required />
           </div>
 
           <div className="field">
@@ -64,12 +84,12 @@ export default function ScheduleModal({ isOpen, onClose, onAddSchedule }) {
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
             <div className="field">
-              <label className="field-label">Jumlah SKS</label>
+              <label className="field-label">SKS</label>
               <input type="number" className="field-input" value={sks} onChange={(e) => setSks(e.target.value)} />
             </div>
 
             <div className="field">
-              <label className="field-label">Status Kelas</label>
+              <label className="field-label">Status</label>
               <select className="field-select" value={status} onChange={(e) => setStatus(e.target.value)}>
                 <option value="Upcoming">Upcoming</option>
                 <option value="Ongoing">Ongoing</option>

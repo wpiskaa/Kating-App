@@ -35,6 +35,15 @@ export default function CountdownWidget({ tasks }) {
     };
   };
 
+  const formatTaskDateDay = (deadlineStr) => {
+    const d = new Date(deadlineStr);
+    const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const dayName = days[d.getDay()];
+    const dateStr = d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+    const timeStr = d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+    return `${dayName}, ${dateStr} (${timeStr})`;
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
       {sortedTasks.map((task) => {
@@ -48,7 +57,7 @@ export default function CountdownWidget({ tasks }) {
                 <span className="h4">{task.title}</span>
                 <span className={`badge ${task.category === 'Kelompok' ? 'badge-cyan' : 'badge-yellow'}`}>{task.category}</span>
               </div>
-              <span className="dim">{task.subject}</span>
+              <span className="dim">{task.subject} • {formatTaskDateDay(task.deadline)}</span>
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>

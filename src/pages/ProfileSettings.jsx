@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { UserCheck, Shield, Moon, Sun, Bell, RefreshCw, LogOut, CheckCircle2, ChevronRight, Sliders, Edit2, X, PlusCircle, BookOpen, CheckSquare, Camera, Upload, Award, FileText, Sparkles, Trash2, Plus, Eye } from 'lucide-react';
+import { UserCheck, Shield, Moon, Sun, Bell, RefreshCw, LogOut, CheckCircle2, ChevronRight, Sliders, Edit2, X, PlusCircle, BookOpen, CheckSquare, Camera, Upload, Award, FileText, Sparkles, Trash2, Plus, Calendar } from 'lucide-react';
 import { logoutUser } from '../services/authService';
 import { generateATSCV } from '../utils/pdfEngine';
 import ScheduleModal from '../components/ScheduleModal';
 import TaskModal from '../components/TaskModal';
 import UploadForm from '../components/UploadForm';
 
-export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, onAddSchedule, onAddTask }) {
+export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, onAddSchedule, onAddTask, availableCourses = [] }) {
   const [notifications, setNotifications] = useState(true);
   const [demoResetMsg, setDemoResetMsg] = useState('');
   
@@ -120,11 +120,11 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
                 <span className="h3">{displayName}</span>
                 <UserCheck size={12} color="#10b981" />
               </div>
-              <span className="dim">{prodi} • Sem {semester}</span>
+              <span className="dim">{prodi} • Semester {semester}</span>
             </div>
           </div>
 
-          <button onClick={() => setIsEditingProfile(true)} className="icon-btn" title="Edit Profil">
+          <button onClick={() => setIsEditingProfile(true)} className="icon-btn" title="Edit Profil & Semester">
             <Edit2 size={14} color="#22d3ee" />
           </button>
         </div>
@@ -136,7 +136,7 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
         </div>
       )}
 
-      {/* CV ATS & Brankas Prestasi Section (Disimpan di Profil) */}
+      {/* CV ATS & Brankas Prestasi Section */}
       <div className="card" style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.1) 0%, rgba(34,211,238,0.06) 100%)' }}>
         <div className="section-row">
           <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
@@ -163,7 +163,7 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
       <div className="card">
         <div className="section-row">
           <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <PlusCircle size={14} color="#22d3ee" /> Kelola Input Data
+            <PlusCircle size={14} color="#22d3ee" /> Kelola Input Data (Semester {semester})
           </span>
         </div>
 
@@ -177,7 +177,7 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
 
           <button onClick={() => setIsTaskModalOpen(true)} className="btn-ghost" style={{ justifyContent: 'space-between' }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <CheckSquare size={13} color="#22d3ee" /> Input Tugas (Mandiri / Kelompok)
+              <CheckSquare size={13} color="#22d3ee" /> Input Tugas Matkul Semester Ini
             </span>
             <span className="badge badge-cyan">+ Tambah</span>
           </button>
@@ -188,7 +188,7 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
       <div className="card">
         <div className="section-row">
           <span className="h3" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <Sliders size={14} color="#818cf8" /> Pengaturan
+            <Sliders size={14} color="#818cf8" /> Pengaturan Sistem
           </span>
         </div>
 
@@ -238,7 +238,57 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
         </div>
       </div>
 
-      {/* CV ATS Manager Modal inside Profile */}
+      {/* Edit Profile Modal */}
+      {isEditingProfile && (
+        <div className="overlay" onClick={() => setIsEditingProfile(false)}>
+          <div className="sheet" onClick={(e) => e.stopPropagation()}>
+            <div className="drag-handle" />
+            <div className="section-row">
+              <span className="h3">Edit Profil & Kenaikan Semester</span>
+              <button onClick={() => setIsEditingProfile(false)} className="icon-btn"><X size={16} /></button>
+            </div>
+
+            <form onSubmit={handleSaveProfile}>
+              <div style={{ textAlign: 'center', marginBottom: '12px' }}>
+                <img src={photoURL} alt="Avatar" style={{ width: '56px', height: '56px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--indigo)', marginBottom: '6px' }} />
+                <div>
+                  <label htmlFor="photo-file-upload-modal" className="badge badge-cyan" style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    <Upload size={10} /> Unggah Foto Baru
+                  </label>
+                  <input type="file" id="photo-file-upload-modal" accept="image/*" style={{ display: 'none' }} onChange={handlePhotoUpload} />
+                </div>
+              </div>
+
+              <div className="field">
+                <label className="field-label">Nama Lengkap</label>
+                <input type="text" className="field-input" value={displayName} onChange={(e) => setDisplayName(e.target.value)} required />
+              </div>
+              <div className="field">
+                <label className="field-label">Program Studi</label>
+                <input type="text" className="field-input" value={prodi} onChange={(e) => setProdi(e.target.value)} required />
+              </div>
+              <div className="field">
+                <label className="field-label">Semester Berjalan</label>
+                <select className="field-select" value={semester} onChange={(e) => setSemester(e.target.value)}>
+                  {[1, 2, 3, 4, 5, 6, 7, 8].map(s => (
+                    <option key={s} value={s}>Semester {s}</option>
+                  ))}
+                </select>
+                <span className="dim" style={{ display: 'block', marginTop: '3px' }}>
+                  Saat naik semester, matkul semester sebelumnya diarsip otomatis.
+                </span>
+              </div>
+
+              <div style={{ display: 'flex', gap: '6px', marginTop: '14px' }}>
+                <button type="button" className="btn-ghost" onClick={() => setIsEditingProfile(false)}>Batal</button>
+                <button type="submit" className="btn">Simpan Perubahan</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* CV ATS Manager Modal */}
       {isCVModalOpen && (
         <div className="overlay" onClick={() => setIsCVModalOpen(false)}>
           <div className="sheet" onClick={(e) => e.stopPropagation()}>
@@ -275,52 +325,9 @@ export default function ProfileSettings({ user, onLogout, theme, onToggleTheme, 
         </div>
       )}
 
-      {/* Edit Profile Modal */}
-      {isEditingProfile && (
-        <div className="overlay" onClick={() => setIsEditingProfile(false)}>
-          <div className="sheet" onClick={(e) => e.stopPropagation()}>
-            <div className="drag-handle" />
-            <div className="section-row">
-              <span className="h3">Edit Profil & Upload Foto</span>
-              <button onClick={() => setIsEditingProfile(false)} className="icon-btn"><X size={16} /></button>
-            </div>
-
-            <form onSubmit={handleSaveProfile}>
-              <div style={{ textAlign: 'center', marginBottom: '12px' }}>
-                <img src={photoURL} alt="Avatar" style={{ width: '56px', height: '56px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--indigo)', marginBottom: '6px' }} />
-                <div>
-                  <label htmlFor="photo-file-upload-modal" className="badge badge-cyan" style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                    <Upload size={10} /> Unggah Foto Baru
-                  </label>
-                  <input type="file" id="photo-file-upload-modal" accept="image/*" style={{ display: 'none' }} onChange={handlePhotoUpload} />
-                </div>
-              </div>
-
-              <div className="field">
-                <label className="field-label">Nama Lengkap</label>
-                <input type="text" className="field-input" value={displayName} onChange={(e) => setDisplayName(e.target.value)} required />
-              </div>
-              <div className="field">
-                <label className="field-label">Program Studi</label>
-                <input type="text" className="field-input" value={prodi} onChange={(e) => setProdi(e.target.value)} required />
-              </div>
-              <div className="field">
-                <label className="field-label">Semester</label>
-                <input type="number" className="field-input" value={semester} onChange={(e) => setSemester(e.target.value)} required />
-              </div>
-
-              <div style={{ display: 'flex', gap: '6px', marginTop: '14px' }}>
-                <button type="button" className="btn-ghost" onClick={() => setIsEditingProfile(false)}>Batal</button>
-                <button type="submit" className="btn">Simpan</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
       {/* Modals for Centralized Input & Upload */}
-      <ScheduleModal isOpen={isScheduleModalOpen} onClose={() => setIsScheduleModalOpen(false)} onAddSchedule={onAddSchedule} />
-      <TaskModal isOpen={isTaskModalOpen} onClose={() => setIsTaskModalOpen(false)} onAddTask={onAddTask} />
+      <ScheduleModal isOpen={isScheduleModalOpen} onClose={() => setIsScheduleModalOpen(false)} onAddSchedule={onAddSchedule} activeSemester={semester} />
+      <TaskModal isOpen={isTaskModalOpen} onClose={() => setIsTaskModalOpen(false)} onAddTask={onAddTask} availableCourses={availableCourses} />
       <UploadForm isOpen={isUploadOpen} onClose={() => setIsUploadOpen(false)} onAddAchievement={handleAddAchievement} />
     </>
   );
