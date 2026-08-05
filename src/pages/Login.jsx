@@ -8,7 +8,6 @@ export default function Login({ onLoginSuccess }) {
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [prodi, setProdi] = useState('Teknologi Informasi');
-  const [semester, setSemester] = useState(6);
 
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -26,7 +25,7 @@ export default function Login({ onLoginSuccess }) {
         displayName: displayName || email.split('@')[0].toUpperCase(),
         email: email,
         prodi: prodi,
-        semester: parseInt(semester)
+        semester: 1 // Default semester awal saat pendaftaran baru
       };
       localStorage.setItem('kating_user', JSON.stringify(userObj));
       setIsLoading(false);
@@ -147,27 +146,16 @@ export default function Login({ onLoginSuccess }) {
                 />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: '8px' }}>
-                <div className="field">
-                  <label className="field-label">Program Studi</label>
-                  <input
-                    type="text"
-                    className="field-input"
-                    placeholder="Teknologi Informasi"
-                    value={prodi}
-                    onChange={(e) => setProdi(e.target.value)}
-                    required
-                  />
-                </div>
-
-                <div className="field">
-                  <label className="field-label">Semester</label>
-                  <select className="field-select" value={semester} onChange={(e) => setSemester(e.target.value)}>
-                    {[1, 2, 3, 4, 5, 6, 7, 8].map(s => (
-                      <option key={s} value={s}>Semester {s}</option>
-                    ))}
-                  </select>
-                </div>
+              <div className="field">
+                <label className="field-label">Program Studi</label>
+                <input
+                  type="text"
+                  className="field-input"
+                  placeholder="Teknologi Informasi"
+                  value={prodi}
+                  onChange={(e) => setProdi(e.target.value)}
+                  required
+                />
               </div>
             </>
           )}
