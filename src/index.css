@@ -2,9 +2,9 @@
 
 :root {
   --bg-app: #030712;
-  --bg-surface: #0b0f19;
+  --bg-surface: #090d16;
   --bg-card: #111827;
-  --bg-card-active: #1f2937;
+  --bg-card-active: #1f293d;
   
   --accent-indigo: #6366f1;
   --accent-cyan: #06b6d4;
@@ -13,21 +13,23 @@
   --accent-amber: #f59e0b;
   
   --accent-gradient: linear-gradient(135deg, #6366f1 0%, #06b6d4 100%);
+  --card-gradient: linear-gradient(145deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
   
   --text-primary: #f9fafb;
   --text-secondary: #9ca3af;
   --text-tertiary: #6b7280;
   
-  --border-subtle: rgba(255, 255, 255, 0.07);
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-highlight: rgba(255, 255, 255, 0.14);
   --border-focus: rgba(99, 102, 241, 0.4);
   
-  --radius-app: 0px;
-  --radius-card: 20px;
-  --radius-inner: 14px;
+  --radius-card: 16px;
+  --radius-inner: 10px;
   --radius-pill: 9999px;
   
-  --nav-height: 68px;
-  --header-height: 60px;
+  --nav-height: 56px;
+  --header-height: 50px;
+  --shadow-card: 0 4px 16px -2px rgba(0, 0, 0, 0.5), inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
 }
 
 * {
@@ -41,7 +43,8 @@ body {
   font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   background-color: var(--bg-app);
   color: var(--text-primary);
-  line-height: 1.5;
+  line-height: 1.35;
+  font-size: 0.775rem; /* Reduced base font size for native compact mobile feel */
   min-height: 100vh;
   overflow-x: hidden;
   user-select: none;
@@ -59,17 +62,17 @@ body {
 
 .mobile-app-shell {
   width: 100%;
-  max-width: 440px; /* Clean Mobile Viewport */
+  max-width: 412px; /* Perfect Compact Mobile Frame */
   min-height: 100vh;
   background-color: var(--bg-surface);
   display: flex;
   flex-direction: column;
   position: relative;
-  box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.9);
   border-left: 1px solid var(--border-subtle);
   border-right: 1px solid var(--border-subtle);
   padding-top: var(--header-height);
-  padding-bottom: calc(var(--nav-height) + 1.25rem);
+  padding-bottom: calc(var(--nav-height) + 1rem);
 }
 
 /* Top App Header Bar */
@@ -81,14 +84,14 @@ body {
   width: 100%;
   max-width: inherit;
   height: var(--header-height);
-  background: rgba(11, 15, 25, 0.85);
+  background: rgba(9, 13, 22, 0.88);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 1.25rem;
+  padding: 0 1rem;
   z-index: 1000;
 }
 
@@ -101,14 +104,14 @@ body {
   width: 100%;
   max-width: inherit;
   height: var(--nav-height);
-  background: rgba(17, 24, 39, 0.9);
+  background: rgba(17, 24, 39, 0.92);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   border-top: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
   justify-content: space-around;
-  padding: 0 0.5rem;
+  padding: 0 0.25rem;
   z-index: 1000;
 }
 
@@ -117,14 +120,14 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  gap: 2px;
   color: var(--text-tertiary);
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   font-weight: 600;
   text-decoration: none;
   flex: 1;
-  padding: 0.4rem 0;
-  transition: all 0.2s ease;
+  padding: 0.25rem 0;
+  transition: all 0.15s ease;
 }
 
 .nav-tab.active {
@@ -132,64 +135,65 @@ body {
 }
 
 .nav-tab-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 10px;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.15s ease;
 }
 
 .nav-tab.active .nav-tab-icon {
   background: var(--accent-gradient);
   color: white;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+  box-shadow: 0 3px 10px rgba(99, 102, 241, 0.4);
 }
 
 /* Page Container */
 .page-container {
-  padding: 1rem 1.15rem;
+  padding: 0.85rem;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
-/* Minimalist Mobile Card */
+/* Minimalist Mobile Card with Subtle Depth */
 .card-clean {
   background-color: var(--bg-card);
+  background-image: var(--card-gradient);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-card);
-  padding: 1.15rem;
+  padding: 0.85rem;
+  box-shadow: var(--shadow-card);
   transition: all 0.2s ease;
 }
 
 .card-clean-title {
-  font-size: 0.95rem;
+  font-size: 0.825rem;
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 0.85rem;
+  margin-bottom: 0.65rem;
 }
 
-/* Buttons */
+/* Compact Buttons */
 .btn-minimal {
   background: var(--accent-gradient);
   color: white;
   border: none;
-  padding: 0.75rem 1.15rem;
+  padding: 0.6rem 0.9rem;
   border-radius: var(--radius-inner);
   font-weight: 700;
-  font-size: 0.875rem;
+  font-size: 0.775rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 0.35rem;
   width: 100%;
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.25);
+  box-shadow: 0 3px 12px rgba(99, 102, 241, 0.3);
 }
 
 .btn-minimal:active {
@@ -198,26 +202,26 @@ body {
 }
 
 .btn-minimal-secondary {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgba(255, 255, 255, 0.04);
   color: var(--text-primary);
   border: 1px solid var(--border-subtle);
-  padding: 0.75rem 1.15rem;
+  padding: 0.6rem 0.9rem;
   border-radius: var(--radius-inner);
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 0.35rem;
   width: 100%;
   cursor: pointer;
 }
 
 /* Minimal Badges */
 .pill-badge {
-  padding: 0.2rem 0.6rem;
+  padding: 0.15rem 0.45rem;
   border-radius: var(--radius-pill);
-  font-size: 0.675rem;
+  font-size: 0.625rem;
   font-weight: 700;
   letter-spacing: 0.02em;
 }
@@ -230,19 +234,21 @@ body {
 /* Automated Flagging Styling */
 .flag-critical-card {
   border: 1.5px solid var(--accent-rose) !important;
-  background: linear-gradient(135deg, rgba(244, 63, 94, 0.1) 0%, var(--bg-card) 100%) !important;
+  background: linear-gradient(135deg, rgba(244, 63, 94, 0.12) 0%, var(--bg-card) 100%) !important;
+  box-shadow: 0 0 15px rgba(244, 63, 94, 0.2) !important;
 }
 
 /* Wallet Safe Daily Alert */
 .wallet-alert-card {
   border: 1.5px solid var(--accent-rose) !important;
   background: linear-gradient(135deg, rgba(244, 63, 94, 0.12) 0%, var(--bg-card) 100%) !important;
+  box-shadow: 0 0 18px rgba(244, 63, 94, 0.25) !important;
 }
 
 /* Progress bar components */
 .progress-track {
   width: 100%;
-  height: 6px;
+  height: 5px;
   background-color: rgba(255, 255, 255, 0.06);
   border-radius: var(--radius-pill);
   overflow: hidden;
@@ -272,35 +278,35 @@ body {
 .modal-sheet {
   background-color: var(--bg-surface);
   border: 1px solid var(--border-subtle);
-  border-top-left-radius: 24px;
-  border-top-right-radius: 24px;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
   width: 100%;
-  max-width: 440px;
-  padding: 1.5rem;
+  max-width: 412px;
+  padding: 1.25rem;
   max-height: 85vh;
   overflow-y: auto;
 }
 
 .form-field {
-  margin-bottom: 0.85rem;
+  margin-bottom: 0.75rem;
 }
 
 .form-label-clean {
   display: block;
-  font-size: 0.775rem;
+  font-size: 0.7rem;
   font-weight: 600;
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.25rem;
   color: var(--text-secondary);
 }
 
 .form-input-clean, .form-select-clean, .form-textarea-clean {
   width: 100%;
-  padding: 0.7rem 0.85rem;
+  padding: 0.65rem 0.75rem;
   background-color: var(--bg-card);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-inner);
   color: var(--text-primary);
-  font-size: 0.875rem;
+  font-size: 0.775rem;
   outline: none;
 }
 

@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard';
 import ProjectWorkspace from './pages/ProjectWorkspace';
 import WalletTracker from './pages/WalletTracker';
 import AchievementVault from './pages/AchievementVault';
+import ProfileSettings from './pages/ProfileSettings';
 import { getCurrentSessionUser, subscribeAuthChange, DEMO_USER } from './services/authService';
 
 export default function App() {
@@ -44,6 +45,7 @@ export default function App() {
               <Route path="/projects" element={<ProjectWorkspace currentUser={user} />} />
               <Route path="/wallet" element={<WalletTracker />} />
               <Route path="/achievements" element={<AchievementVault currentUser={user} />} />
+              <Route path="/profile" element={<ProfileSettings user={user} onLogout={handleLogout} />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </div>
