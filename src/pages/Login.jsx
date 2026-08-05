@@ -7,7 +7,6 @@ export default function Login({ onLoginSuccess }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
-  const [prodi, setProdi] = useState('Teknologi Informasi');
 
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -24,8 +23,8 @@ export default function Login({ onLoginSuccess }) {
         ...DEMO_USER,
         displayName: displayName || email.split('@')[0].toUpperCase(),
         email: email,
-        prodi: prodi,
-        semester: 1 // Default semester awal saat pendaftaran baru
+        prodi: 'Belum diisi', // Akan diisi di Profil saat sudah login
+        semester: 1
       };
       localStorage.setItem('kating_user', JSON.stringify(userObj));
       setIsLoading(false);
@@ -133,31 +132,17 @@ export default function Login({ onLoginSuccess }) {
         {/* AUTH FORM */}
         <form onSubmit={handleLoginSubmit}>
           {authMode === 'register' && (
-            <>
-              <div className="field">
-                <label className="field-label">Nama Lengkap</label>
-                <input
-                  type="text"
-                  className="field-input"
-                  placeholder="Hafiz Kurniawan"
-                  value={displayName}
-                  onChange={(e) => setDisplayName(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="field">
-                <label className="field-label">Program Studi</label>
-                <input
-                  type="text"
-                  className="field-input"
-                  placeholder="Teknologi Informasi"
-                  value={prodi}
-                  onChange={(e) => setProdi(e.target.value)}
-                  required
-                />
-              </div>
-            </>
+            <div className="field">
+              <label className="field-label">Nama Lengkap</label>
+              <input
+                type="text"
+                className="field-input"
+                placeholder="Hafiz Kurniawan"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                required
+              />
+            </div>
           )}
 
           <div className="field">
